@@ -1,8 +1,4 @@
 # MerkkiMylly
-University-themed clicker game
-
-
-Kuvaus:
 
 MerkkiMylly on yksinkertainen, cookie clicker -tyylinen nettiselaimessa toimiva peli, yliopistoteemalla. 
 
