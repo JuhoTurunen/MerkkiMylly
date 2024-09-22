@@ -28,26 +28,33 @@ schema.sql tiedostossa on tietokannan rakenne sekä muutama päivitystä valmiik
 
 Kloonaa tämä repositorio omalle koneellesi ja siirry sen juurikansioon. Luo kansioon .env-tiedosto ja määritä sen sisältö seuraavanlaiseksi:
 
+```
 DATABASE_URL=postgresql+psycopg2://merkkimylly:merkkimylly@localhost/merkkimylly_db
 SECRET_KEY=<salainen-avain>
+```
 
 Seuraavaksi aktivoi virtuaaliympäristö ja asenna sovelluksen riippuvuudet komennoilla
 
-(windows cmd ohjeet)
+Windows CMD ohjeet:
 
+```
 $ py -m venv venv
 $ venv\bin\activate
 $ pip install -r requirements.txt
+```
 
 Määritä vielä tietokannan skeema komennolla
 
+```
 $ createdb -U <käyttäjänimi> -h localhost merkkimylly_db
 $ psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f schema.sql
+```
 
 Nyt voit käynnistää sovelluksen komennolla
 
+```
 $ flask run
-
+```
 
 TODO:
 - Email verification
