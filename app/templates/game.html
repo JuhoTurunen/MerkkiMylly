@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block header %}
+<a href="{{url_for('main.profile')}}">Profile</a>
+<a href="{{url_for('main.sign_out')}}">Sign Out</a>
+<form action="{{url_for('main.save_game')}}" method="POST">
+    <button type="submit">Save</button>
+</form>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes">
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<button id="click-button" click-url="{{ url_for('main.click') }}">Click me!</button>
+
+<h2>Shop</h2>
+<ul>
+    {% for upgrade in upgrades %}
+    <li>
+        <form action="{{url_for('main.buy')}}" method="POST">
+            <input type="hidden" name="upgrade_id" value="{{ upgrade.upgrade_id }}">
+            <button type="submit" >{{upgrade.name}}</button>
+        </form> | {{upgrade.buff}} | Price: {{ upgrade.price }}<br>
+        <div class="upgrade desc">{{upgrade.description}}</div>
+    </li>
+    {% endfor %}
+</ul>
+
+<h2>Stats</h2>
+<p>Username: {{ game_data.username }}</p>
+<p>Clicks: <span id="clicks">{{ game_data.clicks }}</span></p>
+<p>Points: <span id="points">{{ game_data.points }}</span></p>
+
+<script src="{{url_for('static', filename='javascript/game.js')}}"></script>
+{% endblock %}

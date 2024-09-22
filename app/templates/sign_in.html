@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - MerkkiMylly{% endblock %}
+
+{% block content %}
+<h2>Sign in</h2>
+{% if session.username %}
+<p>You are already signed in on the account {{ session.username }}</p>
+<a href="/sign_out">Sign out</a>
+{% else %}
+<form action="/sign_in" method="POST">
+    <p>Username:<br>
+        <input type="text" name="username">
+    </p>
+    <p>Password:<br>
+        <input type="password" name="password">
+    </p>
+    <input type="submit" value="Sign in">
+</form>
+{% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes">
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<p>If you do not have an account, you can
+    <a href="{{url_for('main.register')}}">register</a> instead.
+</p>
+{% endblock %}

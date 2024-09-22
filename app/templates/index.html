@@ -1,0 +1,10 @@
+{% extends "base.html" %} 
+
+{% block header %}
+<a href="{{url_for('main.register')}}">Register</a>
+<a href="{{url_for('main.sign_in')}}">Sign In</a>
+{% endblock %}
+
+{% block content %}
+<p>Welcome to MerkkiMylly. Please log in or register to play!</p>
+{% endblock %}

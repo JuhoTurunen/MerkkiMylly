@@ -20,3 +20,9 @@ Tässä on esimerkki siitä millaiselta projektin tietokanta voisi näyttää ta
 
 
 Pelin kehityksen hankaluuden mukaan aion dynaamisesti vähentää tai kasvattaa pelin toimintojen määrää, jotta kerkeän aikarajoitteisiin. 
+
+TODO:
+- Email verification
+- Protection against SQL injections, XSS, and CSRF
+- Passive click upgrades
+- Upgrade price scaling with each purchase

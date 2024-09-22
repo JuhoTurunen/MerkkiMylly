@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Register - MerkkiMylly{% endblock %}
+
+{% block content %}
+<h2>Register</h2>
+{% if session.username %}
+<p>You are already signed in on the account {{ session.username }}</p>
+<a href="/sign_out">Sign out</a>
+{% else %}
+<form action="/register" method="POST">
+    <p>Email:<br>
+        <input type="text" name="email">
+    </p>
+    <p>Username:<br>
+        <input type="text" name="username">
+    </p>
+    <p>Password:<br>
+        <input type="password" name="password">
+    </p>
+    <input type="submit" value="Register">
+</form>
+{% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes">
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<p>If you already have an account, you can
+    <a href="{{url_for('main.sign_in')}}">sign in</a> instead.
+</p>
+{% endblock %}
