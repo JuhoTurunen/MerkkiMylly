@@ -16,10 +16,16 @@ Tässä on esimerkki siitä millaiselta projektin tietokanta voisi näyttää ta
 - Käyttäjät: Käyttäjätilien hallintaa varten, esimerkiksi kirjautumistietoja varten.
 - Haalarimerkit: Taulu keräiltäville haalarimerkeille, jotka ovat palkkioita käytetystä ajasta ja joiden yleisyyttä voi kasvattaa maksamalla pisteitä.
 - Kerätyt päivitykset: Käyttäjäkohtainen tieto ostetuista päivityksistä.
-- CPM (Clicks per Minute) ja score-data: Käyttäjän napsautusten määrän ja pisteiden seurantaan.
+- CPS (Clicks per Second) ja score-data: Käyttäjän napsautusten määrän ja pisteiden seurantaan.
 
 
 Pelin kehityksen hankaluuden mukaan aion dynaamisesti vähentää tai kasvattaa pelin toimintojen määrää, jotta kerkeän aikarajoitteisiin. 
+
+## Nykytilanne
+
+Projektin tietokantapuoli on toimiva ja yksinkertaiset klikkaus-päivitykset ovat pelissä sisällä. Kuitenkin pelistä puuttuu mm. CPS-päivitykset, haalarimerkit ja leaderboard (lisää puutteita löytyy TO-DO osiosta). 
+
+Tavoitteena kolmanteen välipalautukseen olisi saada valmiiksi CPS-päivitykset, profiilien editoinnin, leaderboadin sekä mahdollisesti offline-klikkejen kerryttämisen. Pudotan haalarimerkki-konseptin ainakin toistaiseksi pois kehityslistalta, sillä se ei ole niin kriittinen osa peliä.
 
 ## Ohjeet:
 
@@ -61,3 +67,4 @@ $ flask run
 - Impove UI
 - Add profile page with account settings
 - Add a leaderboard
+- Add offline clicks from passive upgrades
