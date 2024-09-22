@@ -39,7 +39,7 @@ Windows CMD ohjeet:
 
 ```
 $ py -m venv venv
-$ venv\bin\activate
+$ venv\Scripts\activate
 $ pip install -r requirements.txt
 ```
 
@@ -56,7 +56,7 @@ Nyt voit käynnistää sovelluksen komennolla
 $ flask run
 ```
 
-TODO:
+## TODO:
 - Email verification
 - Protection against SQL injections, XSS, and CSRF
 - Passive click upgrades
