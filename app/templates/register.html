@@ -20,6 +20,9 @@
     </p>
     <input type="submit" value="Register">
 </form>
+<p>If you already have an account, you can
+    <a href="{{url_for('main.sign_in')}}">sign in</a> instead.
+</p>
 {% endif %}
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
@@ -30,7 +33,4 @@
 </div>
 {% endif %}
 {% endwith %}
-<p>If you already have an account, you can
-    <a href="{{url_for('main.sign_in')}}">sign in</a> instead.
-</p>
 {% endblock %}

@@ -129,24 +129,24 @@ def register():
         password = request.form.get("password", "")
 
         if not email or not username or not password:
-            flash_and_redirect("All fields are required.", "error", "main.register")
+            return flash_and_redirect("All fields are required.", "error", "main.register")
 
         if len(password) < 8:
-            flash_and_redirect(
+            return flash_and_redirect(
                 "Password must be at least 8 characters long.", "error", "main.register"
             )
 
         result = UserActions.create_user(username, email, password)
         if result.get("success"):
             initialize_session(result.get("user"))
-            flash_and_redirect(
+            return flash_and_redirect(
                 "User created successfully. Welcome to MerkkiMylly!",
                 "success",
                 "main.index",
             )
         else:
             print(result.get("sys_error"))
-            flash_and_redirect(result.get("error"), "error", "main.register")
+            return flash_and_redirect(result.get("error"), "error", "main.register")
     return render_template("register.html")
 
 
@@ -171,11 +171,11 @@ def click():
 @main.route("/buy", methods=["POST"])
 def buy():
     if "user_id" not in session:
-        flash_and_redirect("User not signed in.")
+        return flash_and_redirect("User not signed in.")
 
     upgrade_id = request.form.get("upgrade_id")
     if not upgrade_id:
-        flash_and_redirect("Failed to get upgrade ID.")
+        return flash_and_redirect("Failed to get upgrade ID.")
 
     total_points = session.get("points", 0) + session.get("point_buffer", 0)
 
@@ -200,7 +200,7 @@ def buy():
 @main.route("/save_game", methods=["POST"])
 def save_game():
     if "user_id" not in session:
-        flash_and_redirect("User not signed in.")
+        return flash_and_redirect("User not signed in.")
 
     if session.get("click_buffer", 0) > 0:
         if handle_buffer_update(True):
