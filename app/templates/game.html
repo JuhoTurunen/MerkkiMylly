@@ -30,7 +30,7 @@
         <form action="{{url_for('main.buy')}}" method="POST">
             <input type="hidden" name="upgrade_id" value="{{ upgrade.upgrade_id }}">
             <button type="submit">{{upgrade.name}}</button>
-        </form> | {{upgrade.buff}} | Price: {{ upgrade.price }}<br>
+        </form> | {{upgrade.buff}} | Price: {{ upgrade.price }} | You own: {{upgrade.amount}}<br>
         <div class="upgrade desc">{{upgrade.description}}</div>
     </li>
     {% endfor %}
