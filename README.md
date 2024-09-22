@@ -21,8 +21,39 @@ Tässä on esimerkki siitä millaiselta projektin tietokanta voisi näyttää ta
 
 Pelin kehityksen hankaluuden mukaan aion dynaamisesti vähentää tai kasvattaa pelin toimintojen määrää, jotta kerkeän aikarajoitteisiin. 
 
+
+schema.sql tiedostossa on tietokannan rakenne sekä muutama päivitystä valmiiksi asetettuna. Voit muunnella päivityksiä tietokannassa, mutta "passive_power" on tällä hetkellä vain kosmeettinen.
+
+## Ohjeet:
+
+Kloonaa tämä repositorio omalle koneellesi ja siirry sen juurikansioon. Luo kansioon .env-tiedosto ja määritä sen sisältö seuraavanlaiseksi:
+
+DATABASE_URL=postgresql+psycopg2://merkkimylly:merkkimylly@localhost/merkkimylly_db
+SECRET_KEY=<salainen-avain>
+
+Seuraavaksi aktivoi virtuaaliympäristö ja asenna sovelluksen riippuvuudet komennoilla
+
+(windows cmd ohjeet)
+
+$ py -m venv venv
+$ venv\bin\activate
+$ pip install -r requirements.txt
+
+Määritä vielä tietokannan skeema komennolla
+
+$ createdb -U <käyttäjänimi> -h localhost merkkimylly_db
+$ psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f schema.sql
+
+Nyt voit käynnistää sovelluksen komennolla
+
+$ flask run
+
+
 TODO:
 - Email verification
 - Protection against SQL injections, XSS, and CSRF
 - Passive click upgrades
 - Upgrade price scaling with each purchase
+- Impove UI
+- Add profile page with account settings
+- Add a leaderboard

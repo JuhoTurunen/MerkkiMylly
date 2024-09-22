@@ -23,7 +23,7 @@
 <button id="click-button" click-url="{{ url_for('main.click') }}">Click me!</button>
 
 <h2>Shop</h2>
-<ul>
+<ul id="shop">
     {% for upgrade in upgrades %}
     <li>
         <form action="{{url_for('main.buy')}}" method="POST">
