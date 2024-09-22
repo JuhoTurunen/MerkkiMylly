@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}" />
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
@@ -20,7 +21,7 @@
 {% endif %}
 {% endwith %}
 
-<button id="click-button" click-url="{{ url_for('main.click') }}">Click me!</button>
+<div id="click-button" click-url="{{ url_for('main.click') }}">Click me!</div>
 
 <h2>Shop</h2>
 <ul id="shop">
@@ -28,7 +29,7 @@
     <li>
         <form action="{{url_for('main.buy')}}" method="POST">
             <input type="hidden" name="upgrade_id" value="{{ upgrade.upgrade_id }}">
-            <button type="submit" >{{upgrade.name}}</button>
+            <button type="submit">{{upgrade.name}}</button>
         </form> | {{upgrade.buff}} | Price: {{ upgrade.price }}<br>
         <div class="upgrade desc">{{upgrade.description}}</div>
     </li>

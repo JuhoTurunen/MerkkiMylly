@@ -1,0 +1,47 @@
+#click-button {
+    display: flex;
+    width: 25vmin;
+    height: 25vmin;
+    margin: 20px auto;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    box-shadow: 2px 2px 4px 2px rgb(119, 119, 119);
+    border-radius: 100%;
+    transition: scale 70ms;
+}
+
+#click-button:active {
+    scale: 98%;
+}
+
+.upgrade.desc {
+    font-size: 0.8em;
+    margin: 0 0 5px 10px;
+}
+
+#shop {
+    cursor: default;
+}
+
+#shop form {
+    display: inline-block;
+}
+
+#shop button {
+    background-color: rgb(52, 52, 52);
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+#shop button:hover {
+    background-color: rgb(195, 195, 195);
+    color: black;
+}

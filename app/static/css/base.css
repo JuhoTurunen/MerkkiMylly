@@ -49,34 +49,6 @@ header a:hover, header button:hover {
     background-color: black;
 }
 
-.upgrade.desc {
-    font-size: 0.8em;
-    margin: 0 0 5px 10px;
-}
-
-
-#shop {
-    cursor: default;
-}
-
-#shop form {
-    display: inline-block;
-}
-
-#shop button {
-    background-color: rgb(52, 52, 52);
-    color: white;
-    border: none;
-    padding: 2px 5px;
-    font-size: 1em;
-    cursor: pointer;
-}
-
-#shop button:hover {
-    background-color: rgb(195, 195, 195);
-    color: black;
-}
-
 .alert.success {
     color: green;
 }
