@@ -21,9 +21,6 @@ Tässä on esimerkki siitä millaiselta projektin tietokanta voisi näyttää ta
 
 Pelin kehityksen hankaluuden mukaan aion dynaamisesti vähentää tai kasvattaa pelin toimintojen määrää, jotta kerkeän aikarajoitteisiin. 
 
-
-schema.sql tiedostossa on tietokannan rakenne sekä muutama päivitystä valmiiksi asetettuna. Voit muunnella päivityksiä tietokannassa, mutta "passive_power" on tällä hetkellä vain kosmeettinen.
-
 ## Ohjeet:
 
 Kloonaa tämä repositorio omalle koneellesi ja siirry sen juurikansioon. Luo kansioon .env-tiedosto ja määritä sen sisältö seuraavanlaiseksi:
@@ -43,7 +40,7 @@ $ venv\Scripts\activate
 $ pip install -r requirements.txt
 ```
 
-Määritä vielä tietokannan skeema komennolla
+Seuraavalla komennolla luot tietokannan ja uuden käyttäjän nimeltä "merkkimylly" schema.sql tiedostosta. Tämä käyttäjä saa kaikki oikeudet uudelle tietokannalle "merkkimylly_db". schema.sql tiedosto luo myös tietokannan "upgrades" tauluun valmiita päivityksiä. Jos sinulla on jo tietokanta nimeltä "merkkimylly_db" taikka käyttäjä nimeltä "merkkimylly" en suosittele komennon käyttämistä sellaisenaan.
 
 ```
 $ createdb -U <käyttäjänimi> -h localhost merkkimylly_db
