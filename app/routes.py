@@ -103,8 +103,8 @@ def index():
             upgrade_data = []
 
         return render_template("game.html", game_data=game_data, upgrades=upgrade_data)
-    else:
-        return render_template("index.html")
+
+    return render_template("index.html")
 
 
 @main.route("/sign_in", methods=["GET", "POST"])
@@ -116,8 +116,7 @@ def sign_in():
         if result.get("success"):
             initialize_session(result.get("user"))
             return redirect(url_for("main.index"))
-        else:
-            flash(result.get("error"), "error")
+        flash(result.get("error"), "error")
     return render_template("sign_in.html")
 
 

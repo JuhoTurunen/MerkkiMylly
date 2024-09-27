@@ -1,6 +1,6 @@
 from sqlalchemy import func
-from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from .database import db
 from .models import User, ScoreData, Upgrade, UserUpgrade
@@ -10,8 +10,8 @@ class UserActions:
     @staticmethod
     def create_user(username, email, password):
         existing_user = User.query.filter(
-            (func.lower(User.username) == func.lower(username)) |
-            (func.lower(User.email) == func.lower(email))
+            (func.lower(User.username) == func.lower(username))
+            | (func.lower(User.email) == func.lower(email))
         ).first()
 
         if existing_user:
