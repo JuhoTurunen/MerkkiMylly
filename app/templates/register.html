@@ -16,7 +16,9 @@
         <input type="text" name="username">
     </p>
     <p>Password:<br>
-        <input type="password" name="password">
+        <input type="password" id="password_field" name="password"> 
+        Password must have 8 or more characters. <br>
+        <input type="checkbox" onclick="changePasswordVisibility()" autocomplete="off">Show Password
     </p>
     <input type="submit" value="Register">
 </form>
@@ -33,4 +35,5 @@
 </div>
 {% endif %}
 {% endwith %}
+<script src="{{url_for('static', filename='javascript/authForms.js')}}"></script>
 {% endblock %}

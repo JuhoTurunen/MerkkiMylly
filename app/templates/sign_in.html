@@ -13,7 +13,8 @@
         <input type="text" name="username">
     </p>
     <p>Password:<br>
-        <input type="password" name="password">
+        <input type="password" id="password_field" name="password"> <br>
+        <input type="checkbox" onclick="changePasswordVisibility()" autocomplete="off">Show Password
     </p>
     <input type="submit" value="Sign in">
 </form>
@@ -30,4 +31,5 @@
 <p>If you do not have an account, you can
     <a href="{{url_for('main.register')}}">register</a> instead.
 </p>
+<script src="{{url_for('static', filename='javascript/authForms.js')}}"></script>
 {% endblock %}
