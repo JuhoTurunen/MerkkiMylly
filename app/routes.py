@@ -163,8 +163,7 @@ def click():
                 "point_buffer": session["point_buffer"],
             }
         )
-    else:
-        return jsonify({"error": "Database update failed"}), 500
+    return jsonify({"error": "Database update failed"}), 500
 
 
 @main.route("/buy", methods=["POST"])
@@ -185,9 +184,21 @@ def buy():
         session["click_power"] += result["upgrade_click_power"]
         session["passive_power"] += result["upgrade_passive_power"]
 
-        for upgrade in session["user_upgrades"]:
-            if upgrade["upgrade_id"] == result["upgrade_id"]:
-                upgrade["amount"] = result["upgrade_amount"]
+        print(result["upgrade_amount"])
+        upgrade = next(
+            (u for u in session["user_upgrades"] if u["upgrade_id"] == result["upgrade_id"]), None
+        )
+        if upgrade:
+            upgrade["amount"] = result["upgrade_amount"]
+        else:
+            session["user_upgrades"].append(
+                {
+                    "upgrade_id": result["upgrade_id"],
+                    "amount": result["upgrade_amount"],
+                    "click_power": result["upgrade_click_power"],
+                    "passive_power": result["upgrade_passive_power"],
+                }
+            )
 
         flash(f"Successfully purchased {result['upgrade_name']}!", "success")
     else:
