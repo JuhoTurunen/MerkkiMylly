@@ -1,7 +1,7 @@
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.security import check_password_hash, generate_password_hash
-from sqlalchemy.exc import IntegrityError
 from .database import db
 from .models import User, ScoreData, Upgrade, UserUpgrade
 
