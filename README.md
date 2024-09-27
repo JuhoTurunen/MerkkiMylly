@@ -41,22 +41,22 @@ Seuraavaksi aktivoi virtuaaliympäristö ja asenna sovelluksen riippuvuudet kome
 Windows CMD ohjeet:
 
 ```
-$ py -m venv venv
-$ venv\Scripts\activate
-$ pip install -r requirements.txt
+py -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
 Seuraavalla komennolla luot tietokannan ja uuden käyttäjän nimeltä "merkkimylly" schema.sql tiedostosta. Tämä käyttäjä saa kaikki oikeudet uudelle tietokannalle "merkkimylly_db". schema.sql tiedosto luo myös tietokannan "upgrades" tauluun valmiita päivityksiä. Jos sinulla on jo tietokanta nimeltä "merkkimylly_db" taikka käyttäjä nimeltä "merkkimylly" en suosittele komennon käyttämistä sellaisenaan.
 
 ```
-$ createdb -U <käyttäjänimi> -h localhost merkkimylly_db
-$ psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f schema.sql
+createdb -U <käyttäjänimi> -h localhost merkkimylly_db
+psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f schema.sql
 ```
 
 Nyt voit käynnistää sovelluksen komennolla
 
 ```
-$ flask run
+flask run
 ```
 
 ## TODO:
