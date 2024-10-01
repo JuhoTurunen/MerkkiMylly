@@ -9,7 +9,16 @@ from flask import (
     request,
     session,
 )
-from .user_actions import UserActions
+from .user_actions import (
+    create_user,
+    delete_user,
+    update_user_data,
+    check_password,
+    buy_upgrade,
+    get_user_score,
+    get_user_game_data,
+    list_upgrades,
+)
 
 
 main = Blueprint("main", __name__)
@@ -20,16 +29,24 @@ def initialize_session(user):
     session["user_id"] = user.id
     session["username"] = user.username
     session["email"] = user.email
-    session["clicks"] = user.score_data.clicks
-    session["points"] = user.score_data.points
 
-    game_data = UserActions.get_user_game_data(user.id)
-    if game_data.get("success"):
-        session["user_upgrades"] = game_data["upgrades"]
-        session["click_power"] = game_data["click_power"]
-        session["passive_power"] = game_data["passive_power"]
+    user_score = get_user_score(user.id)
+    if user_score.get("success"):
+        user_score = user_score["user_score"]
+        session["clicks"] = user_score["clicks"]
+        session["points"] = user_score["points"]
     else:
-        flash(game_data.get("error", "Failed to load game data. Please try again."), "error")
+        print(user_score.get("syserror"))
+        flash(user_score.get("error", "Failed to load score data. Please try again."), "error")
+
+    user_game_data = get_user_game_data(user.id)
+    if user_game_data.get("success"):
+        session["user_upgrades"] = user_game_data["upgrades"]
+        session["click_power"] = user_game_data["click_power"]
+        session["passive_power"] = user_game_data["passive_power"]
+    else:
+        print(user_game_data.get("syserror"))
+        flash(user_game_data.get("error", "Failed to load game data. Please try again."), "error")
 
 
 def flash_and_redirect(message, category="error", route="main.index"):
@@ -45,19 +62,20 @@ def handle_buffer_update(ignore_threshold=False):
     if ignore_threshold or session["click_buffer"] >= current_app.config["CLICK_THRESHOLD"]:
         session["clicks"] += session["click_buffer"]
         session["points"] += session["point_buffer"]
-        result = UserActions.update_user(
+        result = update_user_data(
             session["user_id"],
             **{
-                "score_data.clicks": session["clicks"],
-                "score_data.points": session["points"],
+                "user_score.clicks": session["clicks"],
+                "user_score.points": session["points"],
             },
         )
         if result.get("success"):
             session["click_buffer"] = 0
             session["point_buffer"] = 0
         else:
-            return False
-    return True
+            print(result.get("syserror"))
+            return {"error": result.get("error", "Failed to update database. Try again later.")}
+    return {"success": True}
 
 
 @main.route("/")
@@ -71,36 +89,45 @@ def index():
             "passive_power": session.get("passive_power", 0),
         }
 
-        result = UserActions.list_upgrades()
+        session["upgrades"] = []
+        upgrade_data = []
+
+        result = list_upgrades()
         if result.get("success"):
             upgrades = result["upgrades"]
-            upgrade_data = [
-                {
-                    "upgrade_id": upgrade.id,
-                    "name": upgrade.name,
-                    "buff": (
-                        f"Bonus click power: {upgrade.click_power}"
-                        if upgrade.click_power != 0
-                        else f"CPS bonus: {upgrade.passive_power}"
-                    ),
-                    "price": upgrade.price,
-                    "description": upgrade.description,
-                    "amount": next(
-                        (
-                            u["amount"]
-                            for u in session["user_upgrades"]
-                            if u["upgrade_id"] == upgrade.id
-                        ),
-                        0,
-                    ),
-                }
-                for upgrade in upgrades
-            ]
+
+            upgrade_amounts = {
+                u["upgrade_id"]: u["amount"] for u in session.get("user_upgrades", [])
+            }
+
+            for upgrade in upgrades:
+                session["upgrades"].append(
+                    {
+                        "id": upgrade["id"],
+                        "click_power": upgrade["click_power"],
+                        "passive_power": upgrade["passive_power"],
+                        "price": upgrade["price"],
+                    }
+                )
+                buff = (
+                    f"Bonus click power: {upgrade['click_power']}"
+                    if upgrade["click_power"] != 0
+                    else f"CPS bonus: {upgrade['passive_power']}"
+                )
+                upgrade_data.append(
+                    {
+                        "upgrade_id": upgrade["id"],
+                        "name": upgrade["name"],
+                        "buff": buff,
+                        "price": upgrade["price"],
+                        "description": upgrade["description"],
+                        "amount": upgrade_amounts.get(upgrade["id"], 0),
+                    }
+                )
             upgrade_data = sorted(upgrade_data, key=lambda x: x["price"])
         else:
-            print(result.get("error"))
-            flash("Could not get upgrades.", "error")
-            upgrade_data = []
+            print(result.get("syserror"))
+            flash(result.get("error", "Could not get upgrades. Try again later."), "error")
 
         return render_template("game.html", game_data=game_data, upgrades=upgrade_data)
 
@@ -112,11 +139,12 @@ def sign_in():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        result = UserActions.check_password(username, password)
+        result = check_password(username, password)
         if result.get("success"):
             initialize_session(result.get("user"))
             return redirect(url_for("main.index"))
-        flash(result.get("error"), "error")
+        print(result.get("syserror"))
+        flash(result.get("error", "Failed to sign in. Please try again later."), "error")
     return render_template("sign_in.html")
 
 
@@ -135,7 +163,7 @@ def register():
                 "Password must be at least 8 characters long.", "error", "main.register"
             )
 
-        result = UserActions.create_user(username, email, password)
+        result = create_user(username, email, password)
         if result.get("success"):
             initialize_session(result.get("user"))
             return flash_and_redirect(
@@ -143,9 +171,12 @@ def register():
                 "success",
                 "main.index",
             )
-        else:
-            print(result.get("sys_error"))
-            return flash_and_redirect(result.get("error"), "error", "main.register")
+        print(result.get("syserror"))
+        return flash_and_redirect(
+            result.get("error", "Failed to create account. Please try again later."),
+            "error",
+            "main.register",
+        )
     return render_template("register.html")
 
 
@@ -154,7 +185,8 @@ def click():
     if not session["user_id"]:
         return jsonify({"error": "User not logged in"}), 401
 
-    if handle_buffer_update():
+    result = handle_buffer_update()
+    if result.get("success"):
         return jsonify(
             {
                 "clicks": session["clicks"],
@@ -163,7 +195,7 @@ def click():
                 "point_buffer": session["point_buffer"],
             }
         )
-    return jsonify({"error": "Database update failed"}), 500
+    return jsonify({"error": result.get("error")}), 500
 
 
 @main.route("/buy", methods=["POST"])
@@ -175,34 +207,46 @@ def buy():
     if not upgrade_id:
         return flash_and_redirect("Failed to get upgrade ID.")
 
+    upgrade = next(
+        (u for u in session.get("upgrades", []) if str(u["id"]) == str(upgrade_id)), None
+    )
+
+    if not upgrade:
+        return flash_and_redirect("Could not verify upgrade. Please try again later.")
+
+    buy_amount = 1
+
     total_points = session.get("points", 0) + session.get("point_buffer", 0)
+    remaining_points = total_points - upgrade["price"] * buy_amount
+    if remaining_points < 0:
+        return flash_and_redirect("Not enough points to buy this upgrade.")
 
-    result = UserActions.buy_upgrade(session["user_id"], upgrade_id, total_points)
+    result = buy_upgrade(session["user_id"], upgrade["id"], buy_amount)
     if result.get("success"):
-        session["points"] = result["remaining_points"]
+        session["points"] = remaining_points
         session["point_buffer"] = 0
-        session["click_power"] += result["upgrade_click_power"]
-        session["passive_power"] += result["upgrade_passive_power"]
+        session["click_power"] += upgrade["click_power"]
+        session["passive_power"] += upgrade["passive_power"]
 
-        print(result["upgrade_amount"])
-        upgrade = next(
-            (u for u in session["user_upgrades"] if u["upgrade_id"] == result["upgrade_id"]), None
+        user_upgrade = next(
+            (uu for uu in session["user_upgrades"] if uu["upgrade_id"] == upgrade["id"]), None
         )
-        if upgrade:
-            upgrade["amount"] = result["upgrade_amount"]
+        if user_upgrade:
+            user_upgrade["amount"] += buy_amount
         else:
             session["user_upgrades"].append(
                 {
-                    "upgrade_id": result["upgrade_id"],
-                    "amount": result["upgrade_amount"],
-                    "click_power": result["upgrade_click_power"],
-                    "passive_power": result["upgrade_passive_power"],
+                    "upgrade_id": upgrade["id"],
+                    "amount": buy_amount,
+                    "click_power": upgrade["click_power"],
+                    "passive_power": upgrade["passive_power"],
                 }
             )
 
-        flash(f"Successfully purchased {result['upgrade_name']}!", "success")
+        flash(f"Successfully purchased upgrade!", "success")
     else:
-        flash(f"Failed to purchase upgrade: {result.get('error')}", "error")
+        print(result.get("syserror"))
+        flash(result.get("error", "Failed to purchase upgrade. Please try again later."), "error")
 
     return redirect(url_for("main.index"))
 
@@ -213,11 +257,15 @@ def save_game():
         return flash_and_redirect("User not signed in.")
 
     if session.get("click_buffer", 0) > 0:
-        if handle_buffer_update(True):
+        result = handle_buffer_update(True)
+        if result.get("success"):
             flash("Progress saved successfully.", "success")
         else:
             flash(
-                "Something went wrong while saving your progress. Please try again.",
+                result.get(
+                    "error",
+                    "Something went wrong while saving your progress. Please try again later.",
+                ),
                 "error",
             )
     else:

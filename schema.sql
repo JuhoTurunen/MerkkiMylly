@@ -32,10 +32,10 @@ DO $$ BEGIN
 END $$;
 
 --
--- Name: score_data; Type: TABLE; Schema: public; Owner: -
+-- Name: user_score; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.score_data (
+CREATE TABLE public.user_score (
     id integer NOT NULL,
     user_id integer NOT NULL,
     clicks bigint DEFAULT 0,
@@ -44,10 +44,10 @@ CREATE TABLE public.score_data (
 
 
 --
--- Name: score_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: user_score_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.score_data_id_seq
+CREATE SEQUENCE public.user_score_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -57,10 +57,10 @@ CREATE SEQUENCE public.score_data_id_seq
 
 
 --
--- Name: score_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: user_score_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.score_data_id_seq OWNED BY public.score_data.id;
+ALTER SEQUENCE public.user_score_id_seq OWNED BY public.user_score.id;
 
 
 --
@@ -157,11 +157,11 @@ CREATE SEQUENCE public.users_id_seq
 
 
 -- Grant privileges to merkkimylly
-GRANT ALL ON TABLE public.score_data TO merkkimylly;
+GRANT ALL ON TABLE public.user_score TO merkkimylly;
 GRANT ALL ON TABLE public.upgrades TO merkkimylly;
 GRANT ALL ON TABLE public.user_upgrades TO merkkimylly;
 GRANT ALL ON TABLE public.users TO merkkimylly;
-GRANT ALL ON SEQUENCE public.score_data_id_seq TO merkkimylly;
+GRANT ALL ON SEQUENCE public.user_score_id_seq TO merkkimylly;
 GRANT ALL ON SEQUENCE public.upgrades_id_seq TO merkkimylly;
 GRANT ALL ON SEQUENCE public.user_upgrades_id_seq TO merkkimylly;
 GRANT ALL ON SEQUENCE public.users_id_seq TO merkkimylly;
@@ -178,10 +178,10 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: score_data id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_score id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.score_data ALTER COLUMN id SET DEFAULT nextval('public.score_data_id_seq'::regclass);
+ALTER TABLE ONLY public.user_score ALTER COLUMN id SET DEFAULT nextval('public.user_score_id_seq'::regclass);
 
 
 --
@@ -206,11 +206,11 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- Name: score_data score_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_score user_score_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.score_data
-    ADD CONSTRAINT score_data_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.user_score
+    ADD CONSTRAINT user_score_pkey PRIMARY KEY (id);
 
 
 --
@@ -254,11 +254,11 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: score_data score_data_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_score user_score_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.score_data
-    ADD CONSTRAINT score_data_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE NOT VALID;
+ALTER TABLE ONLY public.user_score
+    ADD CONSTRAINT user_score_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE NOT VALID;
 
 
 --
