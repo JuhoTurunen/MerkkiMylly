@@ -71,7 +71,7 @@ CREATE TABLE public.upgrades (
     id integer NOT NULL,
     name character varying(50) NOT NULL,
     description character varying(255) NOT NULL,
-    price integer DEFAULT 0 NOT NULL,
+    base_price integer DEFAULT 0 NOT NULL,
     click_power integer DEFAULT 0 NOT NULL,
     passive_power integer DEFAULT 0 NOT NULL
 );
@@ -303,7 +303,7 @@ SET row_security = off;
 -- Data for Name: upgrades; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.upgrades (id, name, description, price, click_power, passive_power) FROM stdin;
+COPY public.upgrades (id, name, description, base_price, click_power, passive_power) FROM stdin;
 2	Fresher	Buy a fresher to click for you.	100	0	1
 1	New mouse	Buy another mouse to click faster.	20	1	0
 3	Programming course	Write an automated script for clicking.	300	0	2

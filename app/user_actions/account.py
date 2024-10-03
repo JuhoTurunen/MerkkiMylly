@@ -1,4 +1,5 @@
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..database import db
@@ -52,17 +53,31 @@ def delete_user(user_id):
             text("DELETE FROM users WHERE user_id = :user_id"),
             {"user_id": user_id},
         )
-        if result.rowcount != 1:
-            raise Exception(f"Expected to alter one row. Instead affected {result.rowcount}")
+        if result.rowcount == 0:
+            raise ValueError(f"No user found with ID {user_id} when attempting to delete user")
+        if result.rowcount > 1:
+            raise RuntimeError(
+                f"Multiple rows ({result.rowcount}) were affected \
+                when attempting to delete user {user_id}"
+            )
         db.session.commit()
         return {"success": True}
+
+    except ValueError as e:
+        db.session.rollback()
+        return {"syserror": str(e), "error": "User not found."}
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return {
+            "syserror": str(e),
+            "error": "Database error occurred. Please try again later or contact support.",
+        }
     except Exception as e:
         db.session.rollback()
         return {
-            "syserror": e,
-            "error": "Failed to delete account. Please try again later or reach out to game support.",
+            "syserror": str(e),
+            "error": "An unexpected error occurred. Please try again later or contact support.",
         }
-
 
 
 def update_user_data(user_id, **kwargs):

@@ -11,7 +11,6 @@ from flask import (
 )
 from .user_actions import (
     create_user,
-    delete_user,
     update_user_data,
     check_password,
     buy_upgrade,
@@ -52,6 +51,14 @@ def initialize_session(user):
 def flash_and_redirect(message, category="error", route="main.index"):
     flash(message, category)
     return redirect(url_for(route))
+
+
+def round_to_nearest(number, nearest=5):
+    return nearest * round(number / nearest)
+
+
+def calculate_price(base_price, amount):
+    return round_to_nearest(base_price * (current_app.config["PRICE_GROWTH_FACTOR"] ** amount))
 
 
 def handle_buffer_update(ignore_threshold=False):
@@ -101,30 +108,41 @@ def index():
             }
 
             for upgrade in upgrades:
+
+                user_upgrade_amount = upgrade_amounts.get(upgrade["id"], 0)
+
+                price = session.get(
+                    "price", calculate_price(upgrade["base_price"], user_upgrade_amount)
+                )
+
                 session["upgrades"].append(
                     {
                         "id": upgrade["id"],
                         "click_power": upgrade["click_power"],
                         "passive_power": upgrade["passive_power"],
-                        "price": upgrade["price"],
+                        "base_price": upgrade["base_price"],
+                        "price": price,
                     }
                 )
+
                 buff = (
                     f"Bonus click power: {upgrade['click_power']}"
                     if upgrade["click_power"] != 0
                     else f"CPS bonus: {upgrade['passive_power']}"
                 )
+
                 upgrade_data.append(
                     {
                         "upgrade_id": upgrade["id"],
                         "name": upgrade["name"],
                         "buff": buff,
-                        "price": upgrade["price"],
+                        "base_price": upgrade["base_price"],
+                        "price": price,
                         "description": upgrade["description"],
-                        "amount": upgrade_amounts.get(upgrade["id"], 0),
+                        "amount": user_upgrade_amount,
                     }
                 )
-            upgrade_data = sorted(upgrade_data, key=lambda x: x["price"])
+            upgrade_data = sorted(upgrade_data, key=lambda x: x["base_price"])
         else:
             print(result.get("syserror"))
             flash(result.get("error", "Could not get upgrades. Try again later."), "error")
@@ -217,7 +235,14 @@ def buy():
     buy_amount = 1
 
     total_points = session.get("points", 0) + session.get("point_buffer", 0)
-    remaining_points = total_points - upgrade["price"] * buy_amount
+
+    user_upgrade = next(
+        (uu for uu in session["user_upgrades"] if uu["upgrade_id"] == upgrade["id"]), None
+    )
+
+    price = calculate_price(upgrade["base_price"], user_upgrade["amount"]) * buy_amount
+
+    remaining_points = total_points - price
     if remaining_points < 0:
         return flash_and_redirect("Not enough points to buy this upgrade.")
 
@@ -227,10 +252,8 @@ def buy():
         session["point_buffer"] = 0
         session["click_power"] += upgrade["click_power"]
         session["passive_power"] += upgrade["passive_power"]
+        upgrade["price"] = price
 
-        user_upgrade = next(
-            (uu for uu in session["user_upgrades"] if uu["upgrade_id"] == upgrade["id"]), None
-        )
         if user_upgrade:
             user_upgrade["amount"] += buy_amount
         else:
@@ -243,7 +266,7 @@ def buy():
                 }
             )
 
-        flash(f"Successfully purchased upgrade!", "success")
+        flash("Successfully purchased upgrade!", "success")
     else:
         print(result.get("syserror"))
         flash(result.get("error", "Failed to purchase upgrade. Please try again later."), "error")

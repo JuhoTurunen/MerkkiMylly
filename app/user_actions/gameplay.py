@@ -106,7 +106,7 @@ def list_upgrades():
                 "id": upgrade.id,
                 "name": upgrade.name,
                 "description": upgrade.description,
-                "price": upgrade.price,
+                "base_price": upgrade.base_price,
                 "click_power": upgrade.click_power,
                 "passive_power": upgrade.passive_power,
             }
