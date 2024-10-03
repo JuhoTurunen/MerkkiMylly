@@ -240,7 +240,9 @@ def buy():
         (uu for uu in session["user_upgrades"] if uu["upgrade_id"] == upgrade["id"]), None
     )
 
-    price = calculate_price(upgrade["base_price"], user_upgrade["amount"]) * buy_amount
+    upgrade_amount = user_upgrade["amount"] if user_upgrade else 0
+
+    price = calculate_price(upgrade["base_price"], upgrade_amount) * buy_amount
 
     remaining_points = total_points - price
     if remaining_points < 0:
