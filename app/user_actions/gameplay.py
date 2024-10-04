@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from ..database import db
+from . import update_session
 
 
 def buy_upgrade(user_id, upgrade_id, increase):
@@ -29,6 +30,8 @@ def buy_upgrade(user_id, upgrade_id, increase):
 
         db.session.commit()
 
+        update_session(user_id)
+        
         return {"success": True}
     except Exception as e:
         db.session.rollback()
@@ -62,7 +65,7 @@ def get_user_game_data(user_id):
         ]
         click_power = sum(upgrade.click_power * upgrade.amount for upgrade in user_upgrades) + 1
         passive_power = sum(upgrade.passive_power * upgrade.amount for upgrade in user_upgrades)
-
+        
         return {
             "success": True,
             "upgrades": upgrades,

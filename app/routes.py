@@ -9,16 +9,19 @@ from flask import (
     request,
     session,
 )
-from .user_actions import (
-    create_user,
-    update_user_data,
-    check_password,
+from .user_actions.gameplay import (
     buy_upgrade,
     get_user_score,
     get_user_game_data,
     list_upgrades,
 )
 
+from .user_actions.account import (
+    create_user,
+    update_user_data,
+    check_password,
+    get_session_end,
+)
 
 main = Blueprint("main", __name__)
 
@@ -28,6 +31,13 @@ def initialize_session(user):
     session["user_id"] = user.id
     session["username"] = user.username
     session["email"] = user.email
+
+    session_end = get_session_end(user.id)
+
+    if not session_end.get("success"):
+        print(session_end.get("syserror"))
+
+    session["session_end"] = session_end.get("session_end")
 
     user_score = get_user_score(user.id)
     if user_score.get("success"):

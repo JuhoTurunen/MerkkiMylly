@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..database import db
+from . import update_session
 
 
 def create_user(username, email, password):
@@ -33,9 +34,15 @@ def create_user(username, email, password):
 
         user = result.fetchone()
         user_id = user.id
+
         db.session.execute(
-            text("INSERT INTO user_score (user_id) VALUES (:user_id)"), {"user_id": user_id}
+            text("INSERT INTO user_profile (user_id) VALUES (:user_id)"), {"user_id": user_id}
         )
+        db.session.execute(
+            text("INSERT INTO user_session (user_id) VALUES (:user_id)"), {"user_id": user_id}
+        )
+
+        update_session(user_id)
 
         db.session.commit()
         return {"success": True, "user": user}
@@ -93,6 +100,9 @@ def update_user_data(user_id, **kwargs):
                 raise NoResultFound(f"Update for {key} failed.")
 
         db.session.commit()
+
+        update_session(user_id)
+
         return {"success": True}
     except Exception as e:
         db.session.rollback()
@@ -109,5 +119,19 @@ def check_password(username, password):
         if user and check_password_hash(user.password_hash, password):
             return {"success": True, "user": user}
         return {"error": "Wrong password or username."}
+    except Exception as e:
+        return {"syserror": str(e)}
+
+
+def get_session_end(user_id):
+    try:
+        row = db.session.execute(
+            text("SELECT last_update_timestamp FROM user_session WHERE user_id = :user_id"),
+            {"user_id": user_id},
+        ).fetchone()
+
+        if row:
+            return {"success": True, "session_end": row.last_update_timestamp}
+        return {"syserror": f"User {user_id} is without session data"}
     except Exception as e:
         return {"syserror": str(e)}
