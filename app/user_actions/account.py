@@ -39,7 +39,7 @@ def create_user(username, email, password):
             text("INSERT INTO user_profile (user_id) VALUES (:user_id)"), {"user_id": user_id}
         )
         db.session.execute(
-            text("INSERT INTO user_session (user_id) VALUES (:user_id)"), {"user_id": user_id}
+            text("INSERT INTO user_score (user_id) VALUES (:user_id)"), {"user_id": user_id}
         )
 
         update_session(user_id)
