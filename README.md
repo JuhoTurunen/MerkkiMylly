@@ -64,7 +64,6 @@ flask run
 - Protection against SQL injections, XSS, and CSRF
 - Add AJAX handling to upgrades to avoid refresh
 - Passive click upgrades
-- Upgrade price scaling with each purchase
 - Impove UI
 - Add profile page with account settings
 - Add a leaderboard
