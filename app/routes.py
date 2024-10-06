@@ -69,8 +69,14 @@ def round_to_nearest(number, nearest=5):
     return nearest * round(number / nearest)
 
 
-def calculate_price(base_price, amount):
-    return round_to_nearest(base_price * (current_app.config["PRICE_GROWTH_FACTOR"] ** amount))
+def calculate_price(base_price, current_amount, buy_amount=1):
+    total_price = 0
+    for i in range(buy_amount):
+        amount = current_amount + i
+        total_price += round_to_nearest(
+            base_price * (current_app.config["PRICE_GROWTH_FACTOR"] ** amount)
+        )
+    return total_price
 
 
 def handle_cps():
@@ -91,8 +97,6 @@ def handle_cps():
 
     session["last_cps_update"] = current_time - leftover_time
     update_session(session["user_id"], session["last_cps_update"])
-
-    print(f"Time difference: {int(full_seconds)} seconds")
 
 
 def update_score(ignore_threshold=False):
@@ -202,7 +206,7 @@ def sign_in():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        
+
         result = check_password(username, password)
         if result.get("success"):
             initialize_session(result.get("user"))
@@ -276,6 +280,12 @@ def buy():
     if not upgrade_id:
         return flash_and_redirect("Failed to get upgrade ID.")
 
+    try:
+        buy_amount = int(request.form.get("buy_amount", 1))
+        if buy_amount < 1 or buy_amount > 99:
+            return flash_and_redirect("Buy amount needs to be a number from 1 to 99.")
+    except ValueError:
+        return flash_and_redirect("Invalid buy amount.")
     upgrade = next(
         (u for u in session.get("upgrades", []) if str(u["id"]) == str(upgrade_id)), None
     )
@@ -283,17 +293,15 @@ def buy():
     if not upgrade:
         return flash_and_redirect("Could not verify upgrade. Please try again later.")
 
-    buy_amount = 1
-
     total_points = session.get("points", 0) + session.get("point_buffer", 0)
 
     user_upgrade = next(
         (uu for uu in session["user_upgrades"] if uu["upgrade_id"] == upgrade["id"]), None
     )
 
-    upgrade_amount = user_upgrade["amount"] if user_upgrade else 0
+    current_amount = user_upgrade["amount"] if user_upgrade else 0
 
-    price = calculate_price(upgrade["base_price"], upgrade_amount) * buy_amount
+    price = calculate_price(upgrade["base_price"], current_amount, buy_amount)
 
     remaining_points = total_points - price
     if remaining_points < 0:
@@ -303,10 +311,10 @@ def buy():
     if result.get("success"):
         session["points"] = remaining_points
         session["point_buffer"] = 0
-        session["click_power"] += upgrade["click_power"]
-        session["passive_power"] += upgrade["passive_power"]
-        upgrade["price"] = price
-
+        session["click_power"] += upgrade["click_power"] * buy_amount
+        session["passive_power"] += upgrade["passive_power"] * buy_amount
+        upgrade["price"] = calculate_price(upgrade["base_price"], (current_amount + buy_amount))
+        
         if user_upgrade:
             user_upgrade["amount"] += buy_amount
         else:

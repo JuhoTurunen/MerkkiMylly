@@ -30,16 +30,31 @@
 }
 
 #shop form {
-    display: inline-block;
+    display: inline-flex;
+    width: max-content;
+    flex-wrap: nowrap;
 }
 
 #shop button {
+    display: block;
+    padding: 2px 5px;
+    flex-shrink: 0;
+    border: none;
+    font-size: 1em;
+    color: white;
+    background-color: rgb(52, 52, 52);
+    cursor: pointer;
+}
+
+#shop input {
+    display: block;
+    padding: 2px;
+    flex-shrink: 0;
+    border: none;
+    margin-left: 3px;
+    text-align: center;
     background-color: rgb(52, 52, 52);
     color: white;
-    border: none;
-    padding: 2px 5px;
-    font-size: 1em;
-    cursor: pointer;
 }
 
 #shop button:hover {
