@@ -62,6 +62,24 @@
     color: black;
 }
 
+#leaderboard {
+    padding: 10px;
+    text-align: left;
+    position: absolute;
+    right: 10px;
+    top: 70px;
+}
+
+#leaderboard h2{
+    text-align: center;
+    margin: 0;
+}
+
+#leaderboard th, #leaderboard tr {
+    padding: 10px;
+    font-weight: 400;
+}
+
 .upgrade.desc {
     font-size: 0.8em;
     margin: 0 0 5px 10px;

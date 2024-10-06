@@ -23,20 +23,39 @@
 
 <div id="click-button" click-url="{{ url_for('main.click') }}">Click me!</div>
 
-<h2>Shop</h2>
-<ul id="shop">
-    {% for upgrade in upgrades %}
-    <li>
-        <form action="{{url_for('main.buy')}}" method="POST">
-            <input type="hidden" name="upgrade_id" value="{{ upgrade.upgrade_id }}">
-            <button type="submit">{{upgrade.name}}</button>
-            <input type="number" name="buy_amount" value="1" min="1" max="99" step="1">
-        </form> | {{upgrade.buff}} | Price: {{ upgrade.price }} | You own: {{upgrade.amount}}<br>
-        <div class="upgrade desc">{{upgrade.description}}</div>
-    </li>
-    {% endfor %}
-</ul>
+<div id="shop">
+    <h2>Shop</h2>
+    <ul>
+        {% for upgrade in upgrades %}
+        <li>
+            <form action="{{url_for('main.buy')}}" method="POST">
+                <input type="hidden" name="upgrade_id" value="{{ upgrade.upgrade_id }}">
+                <button type="submit">{{upgrade.name}}</button>
+                <input type="number" name="buy_amount" value="1" min="1" max="99" step="1">
+            </form> | {{upgrade.buff}} | Price: {{ upgrade.price }} | You own: {{upgrade.amount}}<br>
+            <div class="upgrade desc">{{upgrade.description}}</div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
+<div id="leaderboard">
+    <h2>Leaderboard</h2>
+    <table>
+        <tr>
+            <th></th>
+            <th>Clicks</th>
+            <th>Username</th>
+        </tr>
+        {% for idx, user in game_data["leaderboard"] %}
+        <tr>
+            <th>{{idx+1}}</th>
+            <th>{{user.clicks}}</th>
+            <th>{{user.username}}</th>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 <h2>Stats</h2>
 <p>Username: {{ game_data.username }}</p>
 <p>Clicks: <span id="clicks">{{ game_data.clicks }}</span></p>

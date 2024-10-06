@@ -15,6 +15,7 @@ from .user_actions.gameplay import (
     get_user_score,
     get_user_game_data,
     list_upgrades,
+    get_leaderboard,
 )
 
 from .user_actions.account import (
@@ -148,14 +149,21 @@ def index():
         "points": session.get("points", 0) + session.get("point_buffer", 0),
         "click_power": session.get("click_power", 1),
         "passive_power": session.get("passive_power", 0),
+        "leaderboard": [],
     }
+    
+    leaderboard_result = get_leaderboard()
+    if leaderboard_result.get("success"):
+        game_data["leaderboard"] = leaderboard_result["leaderboard"]
+    else:
+        print(leaderboard_result.get("syserror"))
 
     session["upgrades"] = []
     upgrade_data = []
 
-    result = list_upgrades()
-    if result.get("success"):
-        upgrades = result["upgrades"]
+    upgrades_result = list_upgrades()
+    if upgrades_result.get("success"):
+        upgrades = upgrades_result["upgrades"]
 
         upgrade_amounts = {u["upgrade_id"]: u["amount"] for u in session.get("user_upgrades", [])}
 
@@ -196,8 +204,8 @@ def index():
             )
         upgrade_data = sorted(upgrade_data, key=lambda x: x["base_price"])
     else:
-        print(result.get("syserror"))
-        flash(result.get("error", "Could not get upgrades. Try again later."), "error")
+        print(upgrades_result.get("syserror"))
+        flash(upgrades_result.get("error", "Could not get upgrades. Try again later."), "error")
 
     return render_template("game.html", game_data=game_data, upgrades=upgrade_data)
 

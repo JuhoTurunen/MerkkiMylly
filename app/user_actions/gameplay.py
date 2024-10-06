@@ -28,7 +28,7 @@ def buy_upgrade(user_id, upgrade_id, increase):
             )
 
         db.session.commit()
-        
+
         return {"success": True}
     except Exception as e:
         db.session.rollback()
@@ -62,7 +62,7 @@ def get_user_game_data(user_id):
         ]
         click_power = sum(upgrade.click_power * upgrade.amount for upgrade in user_upgrades) + 1
         passive_power = sum(upgrade.passive_power * upgrade.amount for upgrade in user_upgrades)
-        
+
         return {
             "success": True,
             "upgrades": upgrades,
@@ -113,5 +113,31 @@ def list_upgrades():
             for upgrade in result
         ]
         return {"success": True, "upgrades": upgrades}
+    except Exception as e:
+        return {"syserror": e}
+
+
+def get_leaderboard():
+    try:
+        result = db.session.execute(
+            text(
+            """
+            SELECT user_score.clicks, users.username
+            FROM user_score
+            JOIN users
+            ON user_score.user_id = users.id
+            ORDER BY user_score.clicks DESC
+            LIMIT 10;                             
+            """
+            )
+        ).fetchall()
+        leaderboard = [
+            {
+                "username": user.username,
+                "clicks": user.clicks,
+            }
+            for user in result
+        ]
+        return {"success": True, "leaderboard": enumerate(leaderboard)}
     except Exception as e:
         return {"syserror": e}
