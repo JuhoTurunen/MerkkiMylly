@@ -9,6 +9,7 @@ from flask import (
     request,
     session,
 )
+from datetime import datetime, timezone, timedelta
 from .user_actions.gameplay import (
     buy_upgrade,
     get_user_score,
@@ -20,6 +21,7 @@ from .user_actions.account import (
     create_user,
     update_user_data,
     check_password,
+    update_session,
     get_session_end,
 )
 
@@ -37,7 +39,7 @@ def initialize_session(user):
     if not session_end.get("success"):
         print(session_end.get("syserror"))
 
-    session["session_end"] = session_end.get("session_end")
+    session["last_cps_update"] = session_end.get("session_end")
 
     user_score = get_user_score(user.id)
     if user_score.get("success"):
@@ -71,14 +73,47 @@ def calculate_price(base_price, amount):
     return round_to_nearest(base_price * (current_app.config["PRICE_GROWTH_FACTOR"] ** amount))
 
 
-def handle_buffer_update(ignore_threshold=False):
+def handle_cps():
+    current_time = datetime.now(timezone.utc)
+
+    last_cps_update = session["last_cps_update"].astimezone(timezone.utc)
+
+    time_difference = (current_time - last_cps_update).total_seconds()
+
+    full_seconds, fractional_seconds = divmod(time_difference, 1)
+
+    leftover_time = timedelta(seconds=fractional_seconds)
+
+    passive_power = session.get("passive_power", 0)
+    passive_points = passive_power * int(full_seconds)
+
+    session["points"] += passive_points
+
+    session["last_cps_update"] = current_time - leftover_time
+    update_session(session["user_id"], session["last_cps_update"])
+
+    print(f"Time difference: {int(full_seconds)} seconds")
+
+
+def update_score(ignore_threshold=False):
+
     if not ignore_threshold:
         session["click_buffer"] = session.get("click_buffer", 0) + 1
         session["point_buffer"] = session.get("point_buffer", 0) + session.get("click_power", 1)
 
     if ignore_threshold or session["click_buffer"] >= current_app.config["CLICK_THRESHOLD"]:
-        session["clicks"] += session["click_buffer"]
+        session["click_buffer"] = session.get("click_buffer", 0)
+        session["point_buffer"] = session.get("point_buffer", 0)
+
+        old_points = session["points"]
+
         session["points"] += session["point_buffer"]
+        handle_cps()
+
+        if old_points == session["points"]:
+            return {"error": "Nothing to update"}
+
+        session["clicks"] += session["click_buffer"]
         result = update_user_data(
             session["user_id"],
             **{
@@ -97,69 +132,69 @@ def handle_buffer_update(ignore_threshold=False):
 
 @main.route("/")
 def index():
-    if "user_id" in session:
-        game_data = {
-            "username": session["username"],
-            "clicks": session.get("clicks", 0) + session.get("click_buffer", 0),
-            "points": session.get("points", 0) + session.get("point_buffer", 0),
-            "click_power": session.get("click_power", 1),
-            "passive_power": session.get("passive_power", 0),
-        }
+    if "user_id" not in session:
+        return render_template("index.html")
 
-        session["upgrades"] = []
-        upgrade_data = []
+    update_score(True)
 
-        result = list_upgrades()
-        if result.get("success"):
-            upgrades = result["upgrades"]
+    game_data = {
+        "username": session["username"],
+        "clicks": session.get("clicks", 0) + session.get("click_buffer", 0),
+        "points": session.get("points", 0) + session.get("point_buffer", 0),
+        "click_power": session.get("click_power", 1),
+        "passive_power": session.get("passive_power", 0),
+    }
 
-            upgrade_amounts = {
-                u["upgrade_id"]: u["amount"] for u in session.get("user_upgrades", [])
-            }
+    session["upgrades"] = []
+    upgrade_data = []
 
-            for upgrade in upgrades:
+    result = list_upgrades()
+    if result.get("success"):
+        upgrades = result["upgrades"]
 
-                user_upgrade_amount = upgrade_amounts.get(upgrade["id"], 0)
+        upgrade_amounts = {u["upgrade_id"]: u["amount"] for u in session.get("user_upgrades", [])}
 
-                price = session.get(
-                    "price", calculate_price(upgrade["base_price"], user_upgrade_amount)
-                )
+        for upgrade in upgrades:
 
-                session["upgrades"].append(
-                    {
-                        "id": upgrade["id"],
-                        "click_power": upgrade["click_power"],
-                        "passive_power": upgrade["passive_power"],
-                        "base_price": upgrade["base_price"],
-                        "price": price,
-                    }
-                )
+            user_upgrade_amount = upgrade_amounts.get(upgrade["id"], 0)
 
-                buff = (
-                    f"Bonus click power: {upgrade['click_power']}"
-                    if upgrade["click_power"] != 0
-                    else f"CPS bonus: {upgrade['passive_power']}"
-                )
+            price = session.get(
+                "price", calculate_price(upgrade["base_price"], user_upgrade_amount)
+            )
 
-                upgrade_data.append(
-                    {
-                        "upgrade_id": upgrade["id"],
-                        "name": upgrade["name"],
-                        "buff": buff,
-                        "base_price": upgrade["base_price"],
-                        "price": price,
-                        "description": upgrade["description"],
-                        "amount": user_upgrade_amount,
-                    }
-                )
-            upgrade_data = sorted(upgrade_data, key=lambda x: x["base_price"])
-        else:
-            print(result.get("syserror"))
-            flash(result.get("error", "Could not get upgrades. Try again later."), "error")
+            session["upgrades"].append(
+                {
+                    "id": upgrade["id"],
+                    "click_power": upgrade["click_power"],
+                    "passive_power": upgrade["passive_power"],
+                    "base_price": upgrade["base_price"],
+                    "price": price,
+                }
+            )
 
-        return render_template("game.html", game_data=game_data, upgrades=upgrade_data)
+            buff = (
+                f"Bonus click power: {upgrade['click_power']}"
+                if upgrade["click_power"] != 0
+                else f"CPS bonus: {upgrade['passive_power']}"
+            )
 
-    return render_template("index.html")
+            upgrade_data.append(
+                {
+                    "upgrade_id": upgrade["id"],
+                    "name": upgrade["name"],
+                    "buff": buff,
+                    "base_price": upgrade["base_price"],
+                    "price": price,
+                    "description": upgrade["description"],
+                    "amount": user_upgrade_amount,
+                }
+            )
+        upgrade_data = sorted(upgrade_data, key=lambda x: x["base_price"])
+    else:
+        print(result.get("syserror"))
+        flash(result.get("error", "Could not get upgrades. Try again later."), "error")
+
+    return render_template("game.html", game_data=game_data, upgrades=upgrade_data)
 
 
 @main.route("/sign_in", methods=["GET", "POST"])
@@ -170,7 +205,12 @@ def sign_in():
         result = check_password(username, password)
         if result.get("success"):
             initialize_session(result.get("user"))
-            return redirect(url_for("main.index"))
+            old_points = session["points"]
+            update_score(True)
+            gained_points = session["points"] - old_points
+            return flash_and_redirect(
+                f"You've collected {gained_points} points from offline gains!", "success"
+            )
         print(result.get("syserror"))
         flash(result.get("error", "Failed to sign in. Please try again later."), "error")
     return render_template("sign_in.html")
@@ -213,7 +253,7 @@ def click():
     if not session["user_id"]:
         return jsonify({"error": "User not logged in"}), 401
 
-    result = handle_buffer_update()
+    result = update_score()
     if result.get("success"):
         return jsonify(
             {
@@ -291,20 +331,17 @@ def save_game():
     if "user_id" not in session:
         return flash_and_redirect("User not signed in.")
 
-    if session.get("click_buffer", 0) > 0:
-        result = handle_buffer_update(True)
-        if result.get("success"):
-            flash("Progress saved successfully.", "success")
-        else:
-            flash(
-                result.get(
-                    "error",
-                    "Something went wrong while saving your progress. Please try again later.",
-                ),
-                "error",
-            )
+    result = update_score(True)
+    if result.get("success"):
+        flash("Progress saved successfully.", "success")
     else:
-        flash("No new progress to save.", "info")
+        flash(
+            result.get(
+                "error",
+                "Something went wrong while saving your progress. Please try again later.",
+            ),
+            "error",
+        )
 
     return redirect(url_for("main.index"))
 

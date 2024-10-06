@@ -9,6 +9,7 @@
     font-size: 2em;
     font-weight: bold;
     color: white;
+    cursor: pointer;
     background-color: black;
     box-shadow: 2px 2px 4px 2px rgb(119, 119, 119);
     border-radius: 100%;
@@ -19,9 +20,9 @@
     scale: 98%;
 }
 
-.upgrade.desc {
-    font-size: 0.8em;
-    margin: 0 0 5px 10px;
+.alert {
+    position: absolute;
+    left: 10px;
 }
 
 #shop {
@@ -44,4 +45,9 @@
 #shop button:hover {
     background-color: rgb(195, 195, 195);
     color: black;
+}
+
+.upgrade.desc {
+    font-size: 0.8em;
+    margin: 0 0 5px 10px;
 }

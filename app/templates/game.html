@@ -39,7 +39,7 @@
 <h2>Stats</h2>
 <p>Username: {{ game_data.username }}</p>
 <p>Clicks: <span id="clicks">{{ game_data.clicks }}</span></p>
-<p>Points: <span id="points">{{ game_data.points }}</span></p>
+<p>Points: <span id="points" passive-power="{{ game_data.passive_power }}">{{ game_data.points }}</span></p>
 
 <script src="{{url_for('static', filename='javascript/game.js')}}"></script>
 {% endblock %}

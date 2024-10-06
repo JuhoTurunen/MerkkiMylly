@@ -3,7 +3,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..database import db
-from . import update_session
 
 
 def create_user(username, email, password):
@@ -42,7 +41,10 @@ def create_user(username, email, password):
             text("INSERT INTO user_score (user_id) VALUES (:user_id)"), {"user_id": user_id}
         )
 
-        update_session(user_id)
+        db.session.execute(
+            text("INSERT INTO user_session (user_id) VALUES (:user_id)"),
+            {"user_id": user_id},
+        )
 
         db.session.commit()
         return {"success": True, "user": user}
@@ -101,8 +103,6 @@ def update_user_data(user_id, **kwargs):
 
         db.session.commit()
 
-        update_session(user_id)
-
         return {"success": True}
     except Exception as e:
         db.session.rollback()
@@ -122,6 +122,28 @@ def check_password(username, password):
     except Exception as e:
         return {"syserror": str(e)}
 
+
+def update_session(user_id, timestamp):
+    result = db.session.execute(
+        text(
+            """
+            UPDATE user_session SET last_update_timestamp = :timestamp 
+            WHERE user_id = :user_id
+            """
+        ),
+        {"user_id": user_id, "timestamp": timestamp},
+    )
+    if result.rowcount == 0:
+        db.session.execute(
+            text(
+                """
+                INSERT INTO user_session (user_id, last_update_timestamp)
+                VALUES (:user_id, :timestamp)
+                """
+            ),
+            {"user_id": user_id, "timestamp": timestamp},
+        )
+    db.session.commit()
 
 def get_session_end(user_id):
     try:

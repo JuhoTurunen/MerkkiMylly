@@ -1,3 +1,21 @@
+const pointsElement = document.getElementById('points');
+const passivePower = pointsElement.getAttribute('passive-power') / 100;
+let currentPoints = Number(pointsElement.innerHTML);
+let lastUpdate = performance.now();
+
+function updatePoints(timestamp) {
+    const deltaTime = timestamp - lastUpdate;
+    if (deltaTime >= 10) {
+        const pointsToAdd = (deltaTime / 10) * passivePower;
+        currentPoints += pointsToAdd;
+        pointsElement.innerHTML = Math.floor(currentPoints);
+        lastUpdate = timestamp;
+    }
+    requestAnimationFrame(updatePoints);
+}
+
+requestAnimationFrame(updatePoints);
+
 
 document.getElementById('click-button').addEventListener('click', function(event) {
     event.preventDefault();
@@ -20,7 +38,7 @@ document.getElementById('click-button').addEventListener('click', function(event
             console.log("Points:", data.points);
             console.log("Point Buffer:", data.point_buffer);
             document.getElementById('clicks').innerHTML = data.clicks + data.click_buffer;
-            document.getElementById('points').innerHTML = data.points + data.point_buffer;
+            currentPoints = data.points + data.point_buffer
         }
     })
     .catch(error => console.error("Request failed:", error));

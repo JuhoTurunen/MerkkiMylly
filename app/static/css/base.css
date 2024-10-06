@@ -49,6 +49,10 @@ header a:hover, header button:hover {
     background-color: black;
 }
 
+main {
+    padding: 10px;
+}
+
 .alert.success {
     color: green;
 }

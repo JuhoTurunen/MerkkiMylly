@@ -1,6 +1,5 @@
 from sqlalchemy import text
 from ..database import db
-from . import update_session
 
 
 def buy_upgrade(user_id, upgrade_id, increase):
@@ -29,8 +28,6 @@ def buy_upgrade(user_id, upgrade_id, increase):
             )
 
         db.session.commit()
-
-        update_session(user_id)
         
         return {"success": True}
     except Exception as e:
