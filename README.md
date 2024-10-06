@@ -25,7 +25,7 @@ Pelin kehityksen hankaluuden mukaan aion dynaamisesti vähentää tai kasvattaa 
 
 Projektin tietokantapuoli on toimiva ja yksinkertaiset klikkaus-päivitykset ovat pelissä sisällä. Kuitenkin pelistä puuttuu mm. CPS-päivitykset, haalarimerkit ja leaderboard (lisää puutteita löytyy TO-DO osiosta). 
 
-Tavoitteena kolmanteen välipalautukseen olisi saada valmiiksi CPS-päivitykset, profiilien editoinnin, leaderboadin sekä mahdollisesti offline-klikkejen kerryttämisen. Pudotan haalarimerkki-konseptin ainakin toistaiseksi pois kehityslistalta, sillä se ei ole niin kriittinen osa peliä.
+Tavoitteena kolmanteen välipalautukseen olisi saada valmiiksi CPS-päivitykset (toimii), profiilien editoinnin, leaderboadin sekä mahdollisesti offline-klikkejen kerryttämisen (toimii). Pudotan haalarimerkki-konseptin ainakin toistaiseksi pois kehityslistalta, sillä se ei ole niin kriittinen osa peliä.
 
 ## Ohjeet:
 
@@ -63,8 +63,5 @@ flask run
 - Email verification
 - Protection against SQL injections, XSS, and CSRF
 - Add AJAX handling to upgrades to avoid refresh
-- Passive click upgrades
-- Impove UI
 - Add profile page with account settings
 - Add a leaderboard
-- Add offline clicks from passive upgrades
