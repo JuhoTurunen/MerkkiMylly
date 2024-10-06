@@ -202,6 +202,7 @@ def sign_in():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
+        
         result = check_password(username, password)
         if result.get("success"):
             initialize_session(result.get("user"))
@@ -213,6 +214,7 @@ def sign_in():
             )
         print(result.get("syserror"))
         flash(result.get("error", "Failed to sign in. Please try again later."), "error")
+        return render_template("sign_in.html", username=username)
     return render_template("sign_in.html")
 
 
@@ -223,28 +225,27 @@ def register():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
+        form_data = {"email": email, "username": username}
+
         if not email or not username or not password:
-            return flash_and_redirect("All fields are required.", "error", "main.register")
+            flash("All fields are required.", "error")
+            return render_template("register.html", form_data=form_data)
 
         if len(password) < 8:
-            return flash_and_redirect(
-                "Password must be at least 8 characters long.", "error", "main.register"
-            )
+            flash("Password must be at least 8 characters long.", "error")
+            return render_template("register.html", form_data=form_data)
 
         result = create_user(username, email, password)
         if result.get("success"):
             initialize_session(result.get("user"))
+            flash("Password must be at least 8 characters long.", "error")
             return flash_and_redirect(
                 "User created successfully. Welcome to MerkkiMylly!",
                 "success",
-                "main.index",
             )
         print(result.get("syserror"))
-        return flash_and_redirect(
-            result.get("error", "Failed to create account. Please try again later."),
-            "error",
-            "main.register",
-        )
+        flash(result.get("error", "Failed to create account. Please try again later."), "error")
+        return render_template("register.html", form_data=form_data)
     return render_template("register.html")
 
 

@@ -10,7 +10,7 @@
 {% else %}
 <form action="/sign_in" method="POST">
     <p>Username:<br>
-        <input type="text" name="username">
+        <input type="text" name="username" value="{{ username if username else '' }}">
     </p>
     <p>Password:<br>
         <input type="password" id="password_field" name="password"> <br>
