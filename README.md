@@ -4,28 +4,13 @@ MerkkiMylly on yksinkertainen, cookie clicker -tyylinen nettiselaimessa toimiva 
 
 Lyhyesti pelin päämäärä on kerätä pisteitä. Niitä saa joko klikkaamalla nappia tai ostamalla päivityksiä jotka tuo tietyn määrän pisteitä minuutissa. Päivityksiä ostetaan pisteillä ja paremmat päivitykset vaativat enemmän pisteitä. 
 
-Ohjelmassa olisi hakutoiminto jolla voi hakea muita pelaajia ja nähdä heidän dataa sekä leaderboard eniten pisteitä omaaville pelaajille.  
-
-Tietyn ajan välein pelaaja saa mahdollisuuden tienata randomisoitu haalarimerkki. Haalarimerkkien esiintyvyyttä voi kasvattaa ostamalla niihin liittyviä päivityksiä.
-
-Kun pelaaja poistuu tallentaa tietokanta poistumis ajan ja kun hän palaa uudelleen peliin, laskee saapumisajan perusteella offline tilassa tienatut pisteet. 
-
-Tässä on esimerkki siitä millaiselta projektin tietokanta voisi näyttää taulujen kannalta:
-
-- Päivitykset: Taulu, joka sisältää ostettavat päivitykset, jotka nopeuttavat pisteiden kertymistä.
-- Käyttäjät: Käyttäjätilien hallintaa varten, esimerkiksi kirjautumistietoja varten.
-- Haalarimerkit: Taulu keräiltäville haalarimerkeille, jotka ovat palkkioita käytetystä ajasta ja joiden yleisyyttä voi kasvattaa maksamalla pisteitä.
-- Kerätyt päivitykset: Käyttäjäkohtainen tieto ostetuista päivityksistä.
-- CPS (Clicks per Second) ja score-data: Käyttäjän napsautusten määrän ja pisteiden seurantaan.
-
-
-Pelin kehityksen hankaluuden mukaan aion dynaamisesti vähentää tai kasvattaa pelin toimintojen määrää, jotta kerkeän aikarajoitteisiin. 
+Ohjelmassa olisi hakutoiminto jolla voi hakea muita pelaajia ja nähdä heidän dataa sekä leaderboard eniten pisteitä omaaville pelaajille.
 
 ## Nykytilanne
 
-Projektin tietokantapuoli on toimiva ja yksinkertaiset klikkaus-päivitykset ovat pelissä sisällä. Kuitenkin pelistä puuttuu mm. CPS-päivitykset, haalarimerkit ja leaderboard (lisää puutteita löytyy TO-DO osiosta). 
+Projektin tietokantapuoli on sekä yleiset pelitoiminnot toimivat, mutta profiilien haku ja editointi puuttuu.
 
-Tavoitteena kolmanteen välipalautukseen olisi saada valmiiksi CPS-päivitykset (toimii), profiilien editoinnin, leaderboadin (toimii) sekä mahdollisesti offline-klikkejen kerryttämisen (toimii). Pudotan haalarimerkki-konseptin ainakin toistaiseksi pois kehityslistalta, sillä se ei ole niin kriittinen osa peliä.
+Tavoitteenani oli saada kolmanteen välipalautukseen mennessä valmiiksi CPS-päivitykset, profiilien editoinnin, leaderboadin sekä offline-klikkejen kerryttämisen. Sain suoritettua kaikki nämä paitsi profiilien editoinnin. Profiili sivu on jo olemassa, mutta toimintoa muokata omia tietoja ei ole vielä. Sain näiden tavoitteiden lisäksi siirryttyä suorien SQL-komentojen käyttöön ORM:n sijaan. Lisäsin peliin monia pienempiä toimintoja ja parannuksia kuten massa osto mahdollisuuden päivityksiin, päivitysten hinnan kasvun toistuvilla ostoksilla sekä päivityksiä pelin ulkonäköön. Tavoitteena lopulliseen palautukseen olisi saada viimeisetkin alla olevan TO-DO-listan osat valmiiksi.
 
 ## Windows ohjeet:
 
@@ -58,7 +43,8 @@ flask run
 ```
 
 ## TODO:
-- Email verification
 - Protection against SQL injections, XSS, and CSRF
 - Add AJAX handling to upgrades to avoid refresh
-- Add profile page with account settings
+- Add profile editing
+- UI improvements
+- Profile search
