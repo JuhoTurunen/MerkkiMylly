@@ -157,3 +157,18 @@ def get_session_end(user_id):
         return {"syserror": f"User {user_id} is without session data"}
     except Exception as e:
         return {"syserror": str(e)}
+
+
+def get_profile(user_id):
+    try:
+        user_profile = db.session.execute(
+            text("SELECT * FROM user_profile WHERE user_id = user_id"),
+            {"user_id": user_id},
+        ).fetchone()
+
+        if user_profile:
+            return {"success": True, "user_profile": user_profile}
+        return {"error": "Could not find profile."}
+    except Exception as e:
+        return {"syserror": str(e)}
+

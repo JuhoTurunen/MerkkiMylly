@@ -21,6 +21,7 @@ from .user_actions.account import (
     create_user,
     update_user_data,
     check_password,
+    get_profile,
     update_session,
     get_session_end,
 )
@@ -314,7 +315,7 @@ def buy():
         session["click_power"] += upgrade["click_power"] * buy_amount
         session["passive_power"] += upgrade["passive_power"] * buy_amount
         upgrade["price"] = calculate_price(upgrade["base_price"], (current_amount + buy_amount))
-        
+
         if user_upgrade:
             user_upgrade["amount"] += buy_amount
         else:
@@ -364,4 +365,20 @@ def sign_out():
 
 @main.route("/profile")
 def profile():
-    return render_template("profile.html")
+    profile_data = {
+        "username": session["username"],
+        "email": session["email"],
+        "clicks": session["clicks"],
+    }
+    result = get_profile(session["user_id"])
+    if result.get("success"):
+        profile = result["user_profile"]
+        profile_data["created_at"] = profile.created_at.date()
+    else:
+        print(result.get("syserror"))
+        return flash_and_redirect(
+            result.get("error", "Failed to get profile data. Please try again later."),
+            "error",
+            "main.profile",
+        )
+    return render_template("profile.html", profile_data=profile_data)

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block header %}
+<a href="{{url_for('main.index')}}">Game</a>
+<a href="{{url_for('main.sign_out')}}">Sign Out</a>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}" />
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes">
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<h2>Profile</h2>
+<p>Username: {{ profile_data.username }}</p>
+<p>Email: {{ profile_data.username }}</p>
+<p>Clicks: <span id="clicks">{{ profile_data.clicks }}</span></p>
+
+<p>Account created at: {{ profile_data.created_at }}</p>
+
+
+{% endblock %}
