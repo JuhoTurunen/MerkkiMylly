@@ -10,7 +10,9 @@ Ohjelmassa olisi hakutoiminto jolla voi hakea muita pelaajia ja nähdä heidän 
 
 Projektin tietokantapuoli on sekä yleiset pelitoiminnot toimivat, mutta profiilien haku ja editointi puuttuu.
 
-Tavoitteenani oli saada kolmanteen välipalautukseen mennessä valmiiksi CPS-päivitykset, profiilien editoinnin, leaderboadin sekä offline-klikkejen kerryttämisen. Sain suoritettua kaikki nämä paitsi profiilien editoinnin. Profiili sivu on jo olemassa, mutta toimintoa muokata omia tietoja ei ole vielä. Sain näiden tavoitteiden lisäksi siirryttyä suorien SQL-komentojen käyttöön ORM:n sijaan. Lisäsin peliin monia pienempiä toimintoja ja parannuksia kuten massa osto mahdollisuuden päivityksiin, päivitysten hinnan kasvun toistuvilla ostoksilla sekä päivityksiä pelin ulkonäköön. Tavoitteena lopulliseen palautukseen olisi saada viimeisetkin alla olevan TO-DO-listan osat valmiiksi.
+Tavoitteenani oli saada kolmanteen välipalautukseen mennessä valmiiksi CPS-päivitykset, profiilien editoinnin, leaderboadin sekä offline-klikkejen kerryttämisen. Sain suoritettua kaikki nämä paitsi profiilien editoinnin. Profiili sivu on jo olemassa, mutta toimintoa muokata omia tietoja ei ole vielä. 
+
+Sain näiden tavoitteiden lisäksi siirryttyä suorien SQL-komentojen käyttöön ORM:n sijaan. Lisäsin peliin monia pienempiä toimintoja ja parannuksia kuten massa osto mahdollisuuden päivityksiin, päivitysten hinnan kasvun toistuvilla ostoksilla sekä päivityksiä pelin ulkonäköön. Tavoitteena lopulliseen palautukseen olisi saada viimeisetkin alla olevan TO-DO-listan osat valmiiksi.
 
 ## Windows ohjeet:
 
