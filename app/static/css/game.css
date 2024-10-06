@@ -71,13 +71,36 @@
 }
 
 #leaderboard h2{
-    text-align: center;
+    height: 1.5em;
     margin: 0;
+    padding-right: 1em;
+    line-height: 1.5em;
+    text-align: center;
+    position: relative;
 }
 
 #leaderboard th, #leaderboard tr {
     padding: 10px;
     font-weight: 400;
+}
+
+#leaderboard a {
+    display: block;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.5em;
+    text-decoration: none;
+    color: black;
+    border-radius: 100%;
+    rotate: 0deg;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transition: rotate 1s;
+}
+
+#leaderboard a:hover {
+    rotate: 360deg;
 }
 
 .upgrade.desc {

@@ -40,7 +40,7 @@
 </div>
 
 <div id="leaderboard">
-    <h2>Leaderboard</h2>
+    <h2>Leaderboard <a href="{{url_for('main.index')}}">&#10227;</a></h2>
     <table>
         <tr>
             <th></th>
@@ -55,6 +55,7 @@
         </tr>
         {% endfor %}
     </table>
+    
 </div>
 <h2>Stats</h2>
 <p>Username: {{ game_data.username }}</p>
