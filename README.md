@@ -27,7 +27,7 @@ Projektin tietokantapuoli on toimiva ja yksinkertaiset klikkaus-päivitykset ova
 
 Tavoitteena kolmanteen välipalautukseen olisi saada valmiiksi CPS-päivitykset (toimii), profiilien editoinnin, leaderboadin (toimii) sekä mahdollisesti offline-klikkejen kerryttämisen (toimii). Pudotan haalarimerkki-konseptin ainakin toistaiseksi pois kehityslistalta, sillä se ei ole niin kriittinen osa peliä.
 
-## Ohjeet:
+## Windows ohjeet:
 
 Kloonaa tämä repositorio omalle koneellesi ja siirry sen juurikansioon. Luo kansioon .env-tiedosto ja määritä sen sisältö seuraavanlaiseksi:
 
@@ -37,8 +37,6 @@ SECRET_KEY=<salainen-avain>
 ```
 
 Seuraavaksi aktivoi virtuaaliympäristö ja asenna sovelluksen riippuvuudet komennoilla
-
-Windows CMD ohjeet:
 
 ```
 py -m venv venv
