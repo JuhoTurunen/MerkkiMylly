@@ -22,7 +22,7 @@
 
 .flashes {
     max-height: 40vh;
-    animation: fade-out 1s 1s forwards;
+    animation: fade-out 1s 10s forwards;
     overflow: hidden;
     position: absolute;
     left: 10px;
