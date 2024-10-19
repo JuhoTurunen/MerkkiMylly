@@ -20,9 +20,27 @@
     scale: 98%;
 }
 
-.alert {
+.flashes {
+    max-height: 40vh;
+    animation: fade-out 1s 1s forwards;
+    overflow: hidden;
     position: absolute;
     left: 10px;
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+
+    95% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+        max-height: 0;
+    }
 }
 
 #shop {
@@ -70,7 +88,7 @@
     top: 70px;
 }
 
-#leaderboard h2{
+#leaderboard h2 {
     height: 1.5em;
     margin: 0;
     padding-right: 1em;

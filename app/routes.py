@@ -251,7 +251,6 @@ def register():
         result = create_user(username, email, password)
         if result.get("success"):
             initialize_session(result.get("user"))
-            flash("Password must be at least 8 characters long.", "error")
             return flash_and_redirect(
                 "User created successfully. Welcome to MerkkiMylly!",
                 "success",
