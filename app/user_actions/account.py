@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
@@ -124,7 +125,7 @@ def check_password(username, password):
 
 
 def update_session(user_id, timestamp):
-    result = db.session.execute(
+    db.session.execute(
         text(
             """
             UPDATE user_session SET last_update_timestamp = :timestamp 
@@ -133,16 +134,6 @@ def update_session(user_id, timestamp):
         ),
         {"user_id": user_id, "timestamp": timestamp},
     )
-    if result.rowcount == 0:
-        db.session.execute(
-            text(
-                """
-                INSERT INTO user_session (user_id, last_update_timestamp)
-                VALUES (:user_id, :timestamp)
-                """
-            ),
-            {"user_id": user_id, "timestamp": timestamp},
-        )
     db.session.commit()
 
 def get_session_end(user_id):
@@ -151,10 +142,23 @@ def get_session_end(user_id):
             text("SELECT last_update_timestamp FROM user_session WHERE user_id = :user_id"),
             {"user_id": user_id},
         ).fetchone()
-
-        if row:
-            return {"success": True, "session_end": row.last_update_timestamp}
-        return {"syserror": f"User {user_id} is without session data"}
+        
+        timestamp = row.last_update_timestamp if row else datetime.now(timezone.utc)
+        
+        if not row:
+            db.session.execute(
+                text(
+                    """
+                    INSERT INTO user_session (user_id, last_update_timestamp)
+                    VALUES (:user_id, :timestamp)
+                    """
+                ),
+                {"user_id": user_id, "timestamp": timestamp},
+            )
+            db.session.commit()
+            
+        return {"success": True, "session_end": timestamp}
+        
     except Exception as e:
         return {"syserror": str(e)}
 
