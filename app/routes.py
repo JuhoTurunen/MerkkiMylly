@@ -10,6 +10,7 @@ from flask import (
     session,
 )
 from datetime import datetime, timezone, timedelta
+import secrets
 from .user_actions.gameplay import (
     buy_upgrade,
     get_user_score,
@@ -67,6 +68,17 @@ def flash_and_redirect(message, category="error", route="main.index"):
     return redirect(url_for(route))
 
 
+def create_csrf_token():
+    if not session.get("csrf"):
+        session["csrf"] = secrets.token_hex(16)
+
+
+def check_csrf_token(token, redirect_to):
+    if session.get("csrf") != token or token == None:
+        print(f"csrf Error. Token is {session.get('csrf')}, received {token}")
+        return flash_and_redirect("Invalid request. Please try again later.", "error", redirect_to)
+
+
 def round_to_nearest(number, nearest=5):
     return nearest * round(number / nearest)
 
@@ -101,13 +113,13 @@ def handle_cps():
     update_session(session["user_id"], session["last_cps_update"])
 
 
-def update_score(ignore_threshold=False):
-
-    if not ignore_threshold:
+def update_score(enable_threshold=False):
+    if enable_threshold:
+        check_csrf_token(request.headers.get("csrf"), "main.index")
         session["click_buffer"] = session.get("click_buffer", 0) + 1
         session["point_buffer"] = session.get("point_buffer", 0) + session.get("click_power", 1)
 
-    if ignore_threshold or session["click_buffer"] >= current_app.config["CLICK_THRESHOLD"]:
+    if not enable_threshold or session["click_buffer"] >= current_app.config["CLICK_THRESHOLD"]:
         session["click_buffer"] = session.get("click_buffer", 0)
         session["point_buffer"] = session.get("point_buffer", 0)
 
@@ -141,8 +153,10 @@ def index():
     if "user_id" not in session:
         return render_template("index.html")
 
-    update_score(True)
+    update_score()
 
+    create_csrf_token()
+    
     game_data = {
         "username": session["username"],
         "clicks": session.get("clicks", 0) + session.get("click_buffer", 0),
@@ -151,7 +165,7 @@ def index():
         "passive_power": session.get("passive_power", 0),
         "leaderboard": [],
     }
-    
+
     leaderboard_result = get_leaderboard()
     if leaderboard_result.get("success"):
         game_data["leaderboard"] = leaderboard_result["leaderboard"]
@@ -207,12 +221,18 @@ def index():
         print(upgrades_result.get("syserror"))
         flash(upgrades_result.get("error", "Could not get upgrades. Try again later."), "error")
 
-    return render_template("game.html", game_data=game_data, upgrades=upgrade_data)
+    return render_template(
+        "game.html", game_data=game_data, upgrades=upgrade_data, csrf=session["csrf"]
+    )
 
 
 @main.route("/sign_in", methods=["GET", "POST"])
 def sign_in():
+    if request.method == "GET":
+        create_csrf_token()
+        return render_template("sign_in.html", csrf=session["csrf"])
     if request.method == "POST":
+        check_csrf_token(request.form.get("csrf"), "main.sign_in")
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
@@ -220,20 +240,23 @@ def sign_in():
         if result.get("success"):
             initialize_session(result.get("user"))
             old_points = session["points"]
-            update_score(True)
+            update_score()
             gained_points = session["points"] - old_points
             return flash_and_redirect(
                 f"You've collected {gained_points} points from offline gains!", "success"
             )
         print(result.get("syserror"))
         flash(result.get("error", "Failed to sign in. Please try again later."), "error")
-        return render_template("sign_in.html", username=username)
-    return render_template("sign_in.html")
+        return render_template("sign_in.html", username=username, csrf=session["csrf"])
 
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "GET":
+        create_csrf_token()
+        return render_template("register.html", csrf=session["csrf"])
     if request.method == "POST":
+        check_csrf_token(request.form.get("csrf"), "main.register")
         email = request.form.get("email", "").strip()
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -242,11 +265,11 @@ def register():
 
         if not email or not username or not password:
             flash("All fields are required.", "error")
-            return render_template("register.html", form_data=form_data)
+            return render_template("register.html", form_data=form_data, csrf=session["csrf"])
 
         if len(password) < 8:
             flash("Password must be at least 8 characters long.", "error")
-            return render_template("register.html", form_data=form_data)
+            return render_template("register.html", form_data=form_data, csrf=session["csrf"])
 
         result = create_user(username, email, password)
         if result.get("success"):
@@ -257,16 +280,14 @@ def register():
             )
         print(result.get("syserror"))
         flash(result.get("error", "Failed to create account. Please try again later."), "error")
-        return render_template("register.html", form_data=form_data)
-    return render_template("register.html")
+        return render_template("register.html", form_data=form_data, csrf=session["csrf"])
 
 
 @main.route("/click", methods=["POST"])
 def click():
     if not session["user_id"]:
         return jsonify({"error": "User not logged in"}), 401
-
-    result = update_score()
+    result = update_score(True)
     if result.get("success"):
         return jsonify(
             {
@@ -281,6 +302,7 @@ def click():
 
 @main.route("/buy", methods=["POST"])
 def buy():
+    check_csrf_token(request.form.get("csrf"), "main.index")
     if "user_id" not in session:
         return flash_and_redirect("User not signed in.")
 
@@ -345,10 +367,11 @@ def buy():
 
 @main.route("/save_game", methods=["POST"])
 def save_game():
+    check_csrf_token(request.form.get("csrf"), "main.index")
     if "user_id" not in session:
         return flash_and_redirect("User not signed in.")
 
-    result = update_score(True)
+    result = update_score()
     if result.get("success"):
         flash("Progress saved successfully.", "success")
     else:

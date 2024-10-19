@@ -9,6 +9,7 @@
 <a href="/sign_out">Sign out</a>
 {% else %}
 <form action="/register" method="POST">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
     <p>Email:<br>
         <input type="text" name="email" required value="{{ form_data.email if form_data else '' }}">
     </p>

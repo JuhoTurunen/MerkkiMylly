@@ -20,12 +20,14 @@ requestAnimationFrame(updatePoints);
 document.getElementById('click-button').addEventListener('click', function(event) {
     event.preventDefault();
     const clickUrl = event.target.getAttribute("click-url");
+    const csrf = event.target.getAttribute("csrf_token");
     
     fetch(clickUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "X-Requested-With": "XMLHttpRequest"
+            "X-Requested-With": "XMLHttpRequest",
+            "csrf": csrf
         }
     })
     .then(response => response.json())
