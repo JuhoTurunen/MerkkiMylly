@@ -45,7 +45,10 @@ flask run
 ```
 
 ## TODO:
+- Schema.sql tiedoston uudelleenrakennus
+- Virheilmoitusten erittely rekisteröinnissä
 - Protection against SQL injections, XSS, and CSRF
+- Aggregate funktioiden käyttöönotto jos löytää tarpeen
 - Add AJAX handling to upgrades to avoid refresh
 - Add profile editing
 - UI improvements
