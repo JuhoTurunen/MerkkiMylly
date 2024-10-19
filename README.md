@@ -46,7 +46,6 @@ flask run
 
 ## TODO:
 - Remake schema.sql
-- Protection against SQL injections, XSS, and CSRF
 - Try to find use cases for aggregate functions
 - Add AJAX handling to upgrades to avoid refresh
 - Add profile editing
