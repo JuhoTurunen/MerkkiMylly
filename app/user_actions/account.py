@@ -136,15 +136,16 @@ def update_session(user_id, timestamp):
     )
     db.session.commit()
 
+
 def get_session_end(user_id):
     try:
         row = db.session.execute(
             text("SELECT last_update_timestamp FROM user_session WHERE user_id = :user_id"),
             {"user_id": user_id},
         ).fetchone()
-        
+
         timestamp = row.last_update_timestamp if row else datetime.now(timezone.utc)
-        
+
         if not row:
             db.session.execute(
                 text(
@@ -156,23 +157,41 @@ def get_session_end(user_id):
                 {"user_id": user_id, "timestamp": timestamp},
             )
             db.session.commit()
-            
+
         return {"success": True, "session_end": timestamp}
-        
+
     except Exception as e:
         return {"syserror": str(e)}
 
 
-def get_profile(user_id):
+def get_profiles(username):
     try:
-        user_profile = db.session.execute(
-            text("SELECT * FROM user_profile WHERE user_id = user_id"),
-            {"user_id": user_id},
-        ).fetchone()
+        profile_rows = db.session.execute(
+            text(
+                """
+                SELECT user_profile.*, user_score.clicks, users.username
+                FROM user_profile
+                INNER JOIN user_score
+                ON user_profile.user_id = user_score.user_id
+                INNER JOIN users
+                ON user_profile.user_id = users.id
+                WHERE LOWER(username) LIKE :username
+                """
+            ),
+            {"username": f"%{username.lower()}%"},
+        ).fetchall()
 
-        if user_profile:
-            return {"success": True, "user_profile": user_profile}
+        profiles = [
+            {
+                "username": profile.username,
+                "clicks": profile.clicks,
+                "created_at": profile.created_at.date(),
+            }
+            for profile in profile_rows
+        ]
+        sorted_profiles = sorted(profiles, key=lambda x: len(x["username"]))
+        if profiles:
+            return {"success": True, "user_profile": sorted_profiles}
         return {"error": "Could not find profile."}
     except Exception as e:
         return {"syserror": str(e)}
-

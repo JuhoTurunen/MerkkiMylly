@@ -23,7 +23,7 @@ from .user_actions.account import (
     create_user,
     update_user_data,
     check_password,
-    get_profile,
+    get_profiles,
     update_session,
     get_session_end,
 )
@@ -156,7 +156,7 @@ def index():
     update_score()
 
     create_csrf_token()
-    
+
     game_data = {
         "username": session["username"],
         "clicks": session.get("clicks", 0) + session.get("click_buffer", 0),
@@ -395,15 +395,15 @@ def sign_out():
 
 @main.route("/profile")
 def profile():
-    profile_data = {
-        "username": session["username"],
-        "email": session["email"],
-        "clicks": session["clicks"],
-    }
-    result = get_profile(session["user_id"])
+    search_username = request.args.get("username") or session["username"]
+    result = get_profiles(search_username)
     if result.get("success"):
-        profile = result["user_profile"]
-        profile_data["created_at"] = profile.created_at.date()
+        profiles = result["user_profile"]
+        if profiles[0]["username"].lower() == search_username.lower():
+            profiles = profiles[0]
+        if search_username.lower() == session["username"].lower():
+            profiles.update({"owner": True, "email": session["email"]})
+
     else:
         print(result.get("syserror"))
         return flash_and_redirect(
@@ -411,4 +411,4 @@ def profile():
             "error",
             "main.profile",
         )
-    return render_template("profile.html", profile_data=profile_data)
+    return render_template("profile.html", profiles=profiles)

@@ -17,13 +17,36 @@
 </div>
 {% endif %}
 {% endwith %}
+<form action="/profile" method="GET">
+    Search for a player: <br>
+    <input type="text" name="username" placeholder="Username" required value="{{ username if username else '' }}">
+    <input type="submit" value="Search">
+</form>
 
-<h2>Profile</h2>
-<p>Username: {{ profile_data.username }}</p>
-<p>Email: {{ profile_data.email }}</p>
-<p>Clicks: <span id="clicks">{{ profile_data.clicks }}</span></p>
-
-<p>Account created at: {{ profile_data.created_at }}</p>
-
+{% if profiles is mapping %}
+{% if profiles.owner %}
+<h2>Your profile:</h2>
+<div id="profile_data">
+    <p>Username: {{ profiles.username }}</p>
+    <p>Email: {{ profiles.email }}</p>
+    <p>Clicks: <span id="clicks">{{ profiles.clicks }}</span></p>
+    <p>Account created on: {{ profiles.created_at }}</p>
+</div>
+{% else %}
+<h2>Profile of {{ profiles.username }}</h2>
+<div id="profile_data">
+    <p>Clicks: <span id="clicks">{{ profiles.clicks }}</span></p>
+    <p>Account created on: {{ profiles.created_at }}</p>
+</div>
+{% endif %}
+{% else %}
+<div class="profiles">
+    {% for profile in profiles %}
+    <form action="/profile" method="GET">
+        <input type="submit" name="username" value="{{ profile.username }}">
+    </form>
+    {% endfor %}
+</div>
+{% endif %}
 
 {% endblock %}
