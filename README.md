@@ -10,11 +10,11 @@ Ohjelmassa olisi hakutoiminto jolla voi hakea muita pelaajia ja nähdä heidän 
 
 Projektin tietokantapuoli on sekä pelitoiminnot toimivat.
 
-Tavoitteenani lopulliselle palautukselle oli luoda profiilien haku, profiilien editointi ja AJAX päivitysten osto toiminnot sovellukseen. Aioin myös korjata CSRF heikkoudet ja varmistaa myös sovelluksen puolustus muita yleisiä tietoturva heikkouksia vastaan. Viimeiseksi halusin viimeisessä palautuksessa erottaa projektin SQL scheman dumpista sekä toteuttaa pienempiä UX päivityksiä mm. Rekisteröinnin virheilmoitusten erittelyä, ja CSS päivityksiä. 
+Tavoitteenani lopulliselle palautukselle oli luoda profiilien haku, profiilien editointi ja AJAX päivitysten osto toiminnot sovellukseen. Aioin myös korjata CSRF heikkoudet ja varmistaa sovelluksen turvallisuuden muita yleisiä tietoturva heikkouksia vastaan. Viimeiseksi halusin viimeisessä palautuksessa erottaa projektin SQL scheman dumpista sekä toteuttaa pienempiä UX päivityksiä mm. Rekisteröinnin virheilmoitusten erittelyä ja CSS päivityksiä. 
 
-Koen saaneeni jokaisen näistä tavoitteesta suoritettua, mukaan lukematta profiilien editointia. En kokenut tämän toiminnon tuovan mitään uutta projektiin oppimisen kannalta, sillä projekti muokkaa tietokantaa jo useaan kertaan, monimutkaisemmillakin keinoilla. Lisäksi aikarajoitteet tulivat vastaan. 
+Koen saaneeni jokaisen näistä tavoitteesta suoritettua, mukaan lukematta profiilien editointia. En kokenut tämän toiminnon tuovan mitään uutta projektiin, oppimisen kannalta, sillä projekti muokkaa tietokantaa jo useaan kertaan, monimutkaisemmillakin keinoilla. Lisäksi aikarajoitteet tulivat vastaan. 
 
-Sain palautteena myös suosituksen ottaa käyttöön aggregate SQL funktioita, mutta en valitettavasti löytänyt tälle järkeviä käyttötarpeita MerkkiMylly sovelluksessa. 
+Sain viimeisessä välipalautuksessa suosituksen ottaa käyttöön aggregate SQL funktioita, mutta en valitettavasti löytänyt tälle järkeviä käyttötarpeita MerkkiMylly sovelluksessa. 
 
 Kaikkiaan uskon projektin olevan hyvällä tasolla. Tavoitteeni projektissa liikkui huomattavasti sovelluksen alkuperäisestä suunnitelmasta, mutta koen näiden muutosten enimmäkseen parantaneen sovelluksen käyttökokemusta. 
 
