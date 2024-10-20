@@ -14,18 +14,27 @@
     box-shadow: 2px 2px 4px 2px rgb(119, 119, 119);
     border-radius: 100%;
     transition: scale 70ms;
+    z-index: 1;
 }
 
 #click-button:active {
     scale: 98%;
 }
 
-.flashes {
-    max-height: 40vh;
-    animation: fade-out 1s 10s forwards;
+#flashes {
+    display: flex;
+    max-height: 30vmin;
+    flex-direction: column-reverse;
     overflow: hidden;
     position: absolute;
     left: 10px;
+    z-index: 0;
+}
+
+.alert {
+    max-height: 2em;
+    animation: fade-out 1s 10s forwards;
+    overflow: hidden;
 }
 
 @keyframes fade-out {
@@ -35,6 +44,7 @@
 
     95% {
         opacity: 0;
+        max-height: 2em;
     }
 
     100% {
@@ -45,6 +55,8 @@
 
 #shop {
     cursor: default;
+    position: relative;
+    z-index: 1;
 }
 
 #shop form {

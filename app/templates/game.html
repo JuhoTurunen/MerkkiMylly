@@ -13,28 +13,28 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}" />
 
 {% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<div class="flashes">
+<div id="flashes">
     {% for category, message in messages %}
     <div class="alert {{ category }}">{{ message }}</div>
     {% endfor %}
 </div>
-{% endif %}
 {% endwith %}
 
-<div id="click-button" csrf_token="{{ csrf }}" click-url="{{ url_for('main.click') }}">Click me!</div>
+<div id="click-button" csrf-token="{{ csrf }}" click-url="{{ url_for('main.click') }}">Click me!</div>
 
 <div id="shop">
     <h2>Shop</h2>
-    <ul>
+    <ul id="upgrade-rows" csrf-token="{{ csrf }}" buy-url="{{url_for('main.buy')}}">
         {% for upgrade in upgrades %}
         <li>
-            <form action="{{url_for('main.buy')}}" method="POST">
-                <input type="hidden" name="csrf" value="{{ csrf }}">
+            <form>
                 <input type="hidden" name="upgrade_id" value="{{ upgrade.upgrade_id }}">
                 <button type="submit">{{upgrade.name}}</button>
                 <input type="number" name="buy_amount" value="1" min="1" max="99" step="1">
-            </form> | {{upgrade.buff}} | Price: {{ upgrade.price }} | You own: {{upgrade.amount}}<br>
+            </form>
+            | {{upgrade.buff}}
+            | Price: <span id="price-span-{{ upgrade.upgrade_id }}">{{ upgrade.price }}</span>
+            | You own: <span id="amount-span-{{ upgrade.upgrade_id }}">{{ upgrade.amount }}</span><br>
             <div class="upgrade desc">{{upgrade.description}}</div>
         </li>
         {% endfor %}
@@ -57,7 +57,7 @@
         </tr>
         {% endfor %}
     </table>
-    
+
 </div>
 <h2>Stats</h2>
 <p>Username: {{ game_data.username }}</p>

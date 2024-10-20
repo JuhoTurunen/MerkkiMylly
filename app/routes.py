@@ -286,7 +286,7 @@ def register():
 @main.route("/click", methods=["POST"])
 def click():
     if not session["user_id"]:
-        return jsonify({"error": "User not logged in"}), 401
+        return jsonify({"error": "User not signed in."})
     result = update_score(True)
     if result.get("success"):
         return jsonify(
@@ -297,31 +297,32 @@ def click():
                 "point_buffer": session["point_buffer"],
             }
         )
-    return jsonify({"error": result.get("error")}), 500
+    return jsonify({"error": "Failed to update clicks to server. Please try again later."})
 
 
 @main.route("/buy", methods=["POST"])
 def buy():
-    check_csrf_token(request.form.get("csrf"), "main.index")
+    check_csrf_token(request.headers.get("csrf"), "main.index")
     if "user_id" not in session:
-        return flash_and_redirect("User not signed in.")
+        return jsonify({"error": "User not signed in."})
 
     upgrade_id = request.form.get("upgrade_id")
     if not upgrade_id:
-        return flash_and_redirect("Failed to get upgrade ID.")
+        return jsonify({"error": "Failed to get upgrade ID."})
 
     try:
         buy_amount = int(request.form.get("buy_amount", 1))
         if buy_amount < 1 or buy_amount > 99:
-            return flash_and_redirect("Buy amount needs to be a number from 1 to 99.")
+            return jsonify({"error": "Buy amount needs to be a number from 1 to 99."})
     except ValueError:
-        return flash_and_redirect("Invalid buy amount.")
+        return jsonify({"error": "Invalid buy amount."})
+
     upgrade = next(
         (u for u in session.get("upgrades", []) if str(u["id"]) == str(upgrade_id)), None
     )
 
     if not upgrade:
-        return flash_and_redirect("Could not verify upgrade. Please try again later.")
+        return jsonify({"error": "Could not verify upgrade. Please try again later."})
 
     total_points = session.get("points", 0) + session.get("point_buffer", 0)
 
@@ -335,34 +336,41 @@ def buy():
 
     remaining_points = total_points - price
     if remaining_points < 0:
-        return flash_and_redirect("Not enough points to buy this upgrade.")
+        return jsonify({"error": "Not enough points to buy this upgrade."})
 
     result = buy_upgrade(session["user_id"], upgrade["id"], buy_amount)
-    if result.get("success"):
-        session["points"] = remaining_points
-        session["point_buffer"] = 0
-        session["click_power"] += upgrade["click_power"] * buy_amount
-        session["passive_power"] += upgrade["passive_power"] * buy_amount
-        upgrade["price"] = calculate_price(upgrade["base_price"], (current_amount + buy_amount))
 
-        if user_upgrade:
-            user_upgrade["amount"] += buy_amount
-        else:
-            session["user_upgrades"].append(
-                {
-                    "upgrade_id": upgrade["id"],
-                    "amount": buy_amount,
-                    "click_power": upgrade["click_power"],
-                    "passive_power": upgrade["passive_power"],
-                }
-            )
-
-        flash("Successfully purchased upgrade!", "success")
-    else:
+    if not result.get("success"):
         print(result.get("syserror"))
-        flash(result.get("error", "Failed to purchase upgrade. Please try again later."), "error")
+        return jsonify({"error": "Failed to purchase upgrade. Please try again later."})
 
-    return redirect(url_for("main.index"))
+    session["points"] = remaining_points
+    session["point_buffer"] = 0
+    session["click_power"] += upgrade["click_power"] * buy_amount
+    session["passive_power"] += upgrade["passive_power"] * buy_amount
+    upgrade["price"] = calculate_price(upgrade["base_price"], (current_amount + buy_amount))
+
+    if user_upgrade:
+        user_upgrade["amount"] += buy_amount
+    else:
+        session["user_upgrades"].append(
+            {
+                "upgrade_id": upgrade["id"],
+                "amount": buy_amount,
+                "click_power": upgrade["click_power"],
+                "passive_power": upgrade["passive_power"],
+            }
+        )
+
+    return jsonify(
+        {
+            "upgrade_id": upgrade_id,
+            "buy_amount": buy_amount,
+            "price": upgrade["price"],
+            "remaining_points": remaining_points,
+            "passive_power": session["passive_power"],
+        }
+    )
 
 
 @main.route("/save_game", methods=["POST"])
