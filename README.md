@@ -8,11 +8,19 @@ Ohjelmassa olisi hakutoiminto jolla voi hakea muita pelaajia ja nähdä heidän 
 
 ## Nykytilanne
 
-Projektin tietokantapuoli on sekä yleiset pelitoiminnot toimivat, mutta profiilien haku ja editointi puuttuu.
+Projektin tietokantapuoli on sekä pelitoiminnot toimivat.
 
-Tavoitteenani oli saada kolmanteen välipalautukseen mennessä valmiiksi CPS-päivitykset, profiilien editoinnin, leaderboadin sekä offline-klikkejen kerryttämisen. Sain suoritettua kaikki nämä paitsi profiilien editoinnin. Profiili sivu on jo olemassa, mutta toimintoa muokata omia tietoja ei ole vielä. 
+Tavoitteenani lopulliselle palautukselle oli luoda profiilien haku, profiilien editointi ja AJAX päivitysten osto toiminnot sovellukseen. Aioin myös korjata CSRF heikkoudet ja varmistaa myös sovelluksen puolustus muita yleisiä tietoturva heikkouksia vastaan. Viimeiseksi halusin viimeisessä palautuksessa erottaa projektin SQL scheman dumpista sekä toteuttaa pienempiä UX päivityksiä mm. Rekisteröinnin virheilmoitusten erittelyä, ja CSS päivityksiä. 
 
-Sain näiden tavoitteiden lisäksi siirryttyä suorien SQL-komentojen käyttöön ORM:n sijaan. Lisäsin peliin monia pienempiä toimintoja ja parannuksia kuten massa osto mahdollisuuden päivityksiin, päivitysten hinnan kasvun toistuvilla ostoksilla sekä päivityksiä pelin ulkonäköön. Tavoitteena lopulliseen palautukseen olisi saada viimeisetkin alla olevan TO-DO-listan osat valmiiksi.
+Koen saaneeni jokaisen näistä tavoitteesta suoritettua, mukaan lukematta profiilien editointia. En kokenut tämän toiminnon tuovan mitään uutta projektiin oppimisen kannalta, sillä projekti muokkaa tietokantaa jo useaan kertaan, monimutkaisemmillakin keinoilla. Lisäksi aikarajoitteet tulivat vastaan. 
+
+Sain palautteena myös suosituksen ottaa käyttöön aggregate SQL funktioita, mutta en valitettavasti löytänyt tälle järkeviä käyttötarpeita MerkkiMylly sovelluksessa. 
+
+Kaikkiaan uskon projektin olevan hyvällä tasolla. Tavoitteeni projektissa liikkui huomattavasti sovelluksen alkuperäisestä suunnitelmasta, mutta koen näiden muutosten enimmäkseen parantaneen sovelluksen käyttökokemusta. 
+
+## Projektin tulevaisuus 
+
+Jos jatkaisin projektin kehitystä lisäisin siihen enemmän yhteisöä ja kilpailua kasvattavia toimintoja, kuten ainejärjestö kiltoja sekä niiden välisen leaderboardin joka näyttäisi minkä järjestön jäsenet ovat saaneet eniten pisteitä. Myös alkuperäisessä suunnitelmassa mukana olleen haalarimerkki konseptin voisi jalostaa mukaan nykyiseen projektiin, jotta peli olisi lähempänä yliopisto teemaa. 
 
 ## Windows ohjeet:
 
@@ -31,11 +39,13 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Seuraavalla komennolla luot tietokannan ja uuden käyttäjän nimeltä "merkkimylly" schema.sql tiedostosta. Tämä käyttäjä saa kaikki oikeudet uudelle tietokannalle "merkkimylly_db". schema.sql tiedosto luo myös tietokannan "upgrades" tauluun valmiita päivityksiä. Jos sinulla on jo tietokanta nimeltä "merkkimylly_db" taikka käyttäjä nimeltä "merkkimylly" en suosittele komennon käyttämistä sellaisenaan.
+Alla olevalla komennolla luot tietokannan ja uuden "merkkimylly" nimisen käyttäjän dump.sql tiedostosta. Tämä käyttäjä saa kaikki oikeudet uudelle tietokannalle "merkkimylly_db". dump.sql tiedosto luo myös tietokannan upgrades tauluun valmiita päivityksiä. Jos sinulla on jo tietokanta nimeltä merkkimylly_db taikka käyttäjä nimeltä merkkimylly, en suosittele komennon suorittamista sellaisenaan.
+
+Voit käyttää myös pelkkää schema.sql tiedostoa, jos haluat luoda vain tietokannan taulukkorakenteen, ilman dataa, käyttäjiä tai oikeuksia. Jos käytät schema.sql tiedostoa sinun täytyy luoda omat päivitykset tietokantaan, jotta saat sovelluksen toimimaan. Voit käyttää mallina dump.sql tiedoston pohjalla olevaa upgrades taulukon data dumppia. 
 
 ```
 createdb -U <käyttäjänimi> -h localhost merkkimylly_db
-psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f schema.sql
+psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f dump.sql
 ```
 
 Nyt voit käynnistää sovelluksen komennolla
@@ -43,9 +53,3 @@ Nyt voit käynnistää sovelluksen komennolla
 ```
 flask run
 ```
-
-## TODO:
-- Try to find use cases for aggregate functions
-- Add AJAX handling to upgrades to avoid refresh
-- Add profile bio editing
-- UI improvements
