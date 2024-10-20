@@ -1,6 +1,24 @@
 h2 {
     margin: 10px 0;
 }
+
+#search {
+    text-align: center;
+}
+
 #profile_data {
     margin: 10px;
+}
+#profiles {
+    width: 50%;
+    margin: 10px auto;
+}
+#profiles input[type="submit"] {
+    width: 100%;
+    margin-top: 5px;
+    padding: 10px;
+    border: 0;
+    text-align: left;
+    font-size: 2em;
+    border-radius: 0;
 }

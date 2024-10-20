@@ -17,7 +17,7 @@
 </div>
 {% endif %}
 {% endwith %}
-<form action="/profile" method="GET">
+<form id="search" action="/profile" method="GET">
     Search for a player: <br>
     <input type="text" name="username" placeholder="Username" required value="{{ username if username else '' }}">
     <input type="submit" value="Search">
@@ -40,10 +40,11 @@
 </div>
 {% endif %}
 {% else %}
-<div class="profiles">
+<div id="profiles">
     {% for profile in profiles %}
     <form action="/profile" method="GET">
-        <input type="submit" name="username" value="{{ profile.username }}">
+        <input type="hidden" name="username" value="{{ profile.username }}">
+        <input type="submit" value="{{ profile.username }} - {{ profile.clicks }}">
     </form>
     {% endfor %}
 </div>
