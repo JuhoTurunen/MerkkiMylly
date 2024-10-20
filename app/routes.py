@@ -1,3 +1,5 @@
+from datetime import datetime, timezone, timedelta
+import secrets
 from flask import (
     Blueprint,
     render_template,
@@ -9,8 +11,6 @@ from flask import (
     request,
     session,
 )
-from datetime import datetime, timezone, timedelta
-import secrets
 from .user_actions.gameplay import (
     buy_upgrade,
     get_user_score,
@@ -74,7 +74,7 @@ def create_csrf_token():
 
 
 def check_csrf_token(token, redirect_to):
-    if session.get("csrf") != token or token == None:
+    if session.get("csrf") != token or token is None:
         print(f"csrf Error. Token is {session.get('csrf')}, received {token}")
         return flash_and_redirect("Invalid request. Please try again later.", "error", redirect_to)
 
