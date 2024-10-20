@@ -45,7 +45,6 @@ flask run
 ```
 
 ## TODO:
-- Remake schema.sql
 - Try to find use cases for aggregate functions
 - Add AJAX handling to upgrades to avoid refresh
 - Add profile bio editing
