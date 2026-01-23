@@ -1,37 +1,25 @@
 # MerkkiMylly
 
-MerkkiMylly on yksinkertainen, cookie clicker -tyylinen nettiselaimessa toimiva peli, yliopistoteemalla. 
+MerkkiMylly is a university-themed, browser-based clicker game built as a full-stack web application.
 
-Lyhyesti pelin päämäärä on kerätä pisteitä. Niitä saa joko klikkaamalla nappia tai ostamalla päivityksiä jotka tuo tietyn määrän pisteitä minuutissa. Päivityksiä ostetaan pisteillä ja paremmat päivitykset vaativat enemmän pisteitä. 
+The game runs on a Flask (Python) backend with a PostgreSQL database that stores all persistent game state, including players, scores, upgrades, and progression. Points are earned through user actions and automated upgrades, with all game logic handled server-side and reflected to the client via HTTP endpoints and AJAX requests.
 
-Ohjelmassa olisi hakutoiminto jolla voi hakea muita pelaajia ja nähdä heidän dataa sekä leaderboard eniten pisteitä omaaville pelaajille.
+The project includes a defined SQL schema and database dump used to model the game economy and initial data, as well as a simple frontend built with HTML, CSS, and JavaScript to provide real-time interaction. The application also supports player lookup and a global leaderboard based on stored score data.
 
-## Nykytilanne
+MerkkiMylly was created as a university course project and is not under active development.
 
-Projektin tietokantapuoli on sekä pelitoiminnot toimivat.
+## Windows setup instructions
 
-Tavoitteenani lopulliselle palautukselle oli luoda profiilien haku, profiilien editointi ja AJAX päivitysten osto toiminnot sovellukseen. Aioin myös korjata CSRF heikkoudet ja varmistaa sovelluksen turvallisuuden muita yleisiä tietoturva heikkouksia vastaan. Viimeiseksi halusin viimeisessä palautuksessa erottaa projektin SQL scheman dumpista sekä toteuttaa pienempiä UX päivityksiä mm. Rekisteröinnin virheilmoitusten erittelyä ja CSS päivityksiä. 
+Clone this repository to your local machine and navigate to the project root directory.
 
-Koen saaneeni jokaisen näistä tavoitteesta suoritettua, mukaan lukematta profiilien editointia. En kokenut tämän toiminnon tuovan mitään uutta projektiin, oppimisen kannalta, sillä projekti muokkaa tietokantaa jo useaan kertaan, monimutkaisemmillakin keinoilla. Lisäksi aikarajoitteet tulivat vastaan. 
-
-Sain viimeisessä välipalautuksessa suosituksen ottaa käyttöön aggregate SQL funktioita, mutta en valitettavasti löytänyt tälle järkeviä käyttötarpeita MerkkiMylly sovelluksessa. 
-
-Kaikkiaan uskon projektin olevan hyvällä tasolla. Tavoitteeni projektissa liikkui huomattavasti sovelluksen alkuperäisestä suunnitelmasta, mutta koen näiden muutosten enimmäkseen parantaneen sovelluksen käyttökokemusta. 
-
-## Projektin tulevaisuus 
-
-Jos jatkaisin projektin kehitystä lisäisin siihen enemmän yhteisöä ja kilpailua kasvattavia toimintoja, kuten ainejärjestö kiltoja sekä niiden välisen leaderboardin joka näyttäisi minkä järjestön jäsenet ovat saaneet eniten pisteitä. Myös alkuperäisessä suunnitelmassa mukana olleen haalarimerkki konseptin voisi jalostaa mukaan nykyiseen projektiin, jotta peli olisi lähempänä yliopisto teemaa. 
-
-## Windows ohjeet:
-
-Kloonaa tämä repositorio omalle koneellesi ja siirry sen juurikansioon. Luo kansioon .env-tiedosto ja määritä sen sisältö seuraavanlaiseksi:
+Create a `.env` file in the root directory and define the following environment variables:
 
 ```
 DATABASE_URL=postgresql+psycopg2://merkkimylly:merkkimylly@localhost/merkkimylly_db
-SECRET_KEY=<salainen-avain>
+SECRET_KEY=<your-secret-key>
 ```
 
-Seuraavaksi aktivoi virtuaaliympäristö ja asenna sovelluksen riippuvuudet komennoilla
+Next, create and activate a virtual environment and install the required dependencies:
 
 ```
 py -m venv venv
@@ -39,16 +27,32 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Alla olevalla komennolla luot tietokannan ja uuden "merkkimylly" nimisen käyttäjän dump.sql tiedostosta. Tämä käyttäjä saa kaikki oikeudet uudelle tietokannalle "merkkimylly_db". dump.sql tiedosto luo myös tietokannan upgrades tauluun valmiita päivityksiä. Jos sinulla on jo tietokanta nimeltä merkkimylly_db taikka käyttäjä nimeltä merkkimylly, en suosittele komennon suorittamista sellaisenaan.
+### Database setup
 
-Voit käyttää myös pelkkää schema.sql tiedostoa, jos haluat luoda vain tietokannan taulukkorakenteen, ilman dataa, käyttäjiä tai oikeuksia. Jos käytät schema.sql tiedostoa sinun täytyy luoda omat päivitykset tietokantaan, jotta saat sovelluksen toimimaan. Voit käyttää mallina dump.sql tiedoston pohjalla olevaa upgrades taulukon data dumppia. 
+The command below creates a PostgreSQL database named `merkkimylly_db` and a user named `merkkimylly` using the provided `dump.sql` file.
+
+The user is granted full permissions on the database.
+
+The `dump.sql` file also inserts initial data into the upgrades table, which is required for the application to function.
+
+> **Note:**
+> If you already have a database named `merkkimylly_db` or a user named `merkkimylly`, do **not** run these commands as-is.
 
 ```
-createdb -U <käyttäjänimi> -h localhost merkkimylly_db
-psql -U <käyttäjänimi> -h localhost -d merkkimylly_db -f dump.sql
+createdb -U <username> -h localhost merkkimylly_db
+psql -U <username> -h localhost -d merkkimylly_db -f dump.sql
 ```
 
-Nyt voit käynnistää sovelluksen komennolla
+#### Alternative: schema-only setup
+
+You may also use `schema.sql` if you only want to create the database table structure without users, permissions, or initial data.
+
+If you use `schema.sql`, you must manually insert upgrade data into the `upgrades` table for the application to work.
+The upgrade entries at the end of `dump.sql` can be used as a reference.
+
+### Running the application
+
+Once the setup is complete, start the application with:
 
 ```
 flask run
